@@ -17,6 +17,9 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<!--<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+		<maven.compiler.source>8</maven.compiler.source>
+		<maven.compiler.target>8</maven.compiler.target>-->
 	</properties>
 
 	<dependencies>
@@ -24,7 +27,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<!--<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>-->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -54,6 +61,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -88,6 +96,28 @@
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
+				<!--<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+					<configuration>
+						<source>1.8</source> &lt;!&ndash; depending on your project &ndash;&gt;
+						<target>1.8</target> &lt;!&ndash; depending on your project &ndash;&gt;
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.mapstruct</groupId>
+								<artifactId>mapstruct-processor</artifactId>
+								<version>${org.mapstruct.version}</version>
+							</path>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok-mapstruct-binding</artifactId>
+								<version>0.2.0</version>
+							</path>
+							&lt;!&ndash; other annotation processors &ndash;&gt;
+						</annotationProcessorPaths>
+					</configuration>
+				</plugin>-->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>

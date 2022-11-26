@@ -18,7 +18,7 @@ public class Item {
     private String description;
     private Boolean available;
 
-    private Long idUser;
+    private Long userId;
     private ItemRequest request;
 
     public Item(String name, String description, Boolean available) {

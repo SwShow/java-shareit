@@ -4,15 +4,16 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemService {
-    ItemDto createItem(ItemDto itemDto, Long idUser) throws ValidationException;
+    ItemDto createItem(ItemDto itemDto, Optional<Long> userId) throws ValidationException;
 
-    ItemDto updateItem(Long idUser, Long itemId, ItemDto itemDto);
+    ItemDto updateItem(Optional<Long> userId, Long itemId, ItemDto itemDto) throws ValidationException;
 
-    ItemDto getItemOfId(Long itemId);
+    ItemDto getItemOfId(Long userId, Long itemId) throws ValidationException;
 
-    List<ItemDto> getItems(Long idUser);
+    List<ItemDto> getItems(Optional<Long> userId) throws ValidationException;
 
-    List<ItemDto> getItemOfText(String text);
+    List<ItemDto> getItemOfText(Optional<Long> userId, String text) throws ValidationException;
 }

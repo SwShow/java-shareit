@@ -2,6 +2,8 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.ConflictException;
@@ -26,35 +28,33 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping()
-    public UserDto create(@Valid @RequestBody UserDto userDto) throws ValidationException, ConflictException {
+    public ResponseEntity<?> create(@Valid @RequestBody UserDto userDto) throws ValidationException, ConflictException {
         log.info("поступил запрос на создание пользователя");
-        return userService.createUser(userDto);
+        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public UserDto updateUser(@PathVariable("id") @Min(1) Long id, @RequestBody UserDto userDto)
+    public ResponseEntity<?> updateUser(@PathVariable("id") @Min(1) Long id, @RequestBody UserDto userDto)
             throws ConflictException {
-            log.info("поступил запрос на изменение данных пользователя");
-            return userService.updateUser(userDto, id);
+        log.info("поступил запрос на изменение данных пользователя");
+        return new ResponseEntity<>(userService.updateUser(userDto, id), HttpStatus.OK);
     }
 
     @GetMapping()
-    public List<UserDto> findAllUsers() {
+    public ResponseEntity<?> findAllUsers() {
         log.info("поступил запрос на получение данных всех пользователей");
-        return userService.findAllUsers();
+        return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public UserDto findUserById(@PathVariable("id") @Min(1) Long id) {
-            log.info("поступил запрос на получение данных пользователя");
-            return userService.findUserById(id);
+    public ResponseEntity<?> findUserById(@PathVariable("id") @Min(1) Long id) {
+        log.info("поступил запрос на получение данных пользователя");
+        return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public UserDto deleteUser(@PathVariable("id") @Min(1) Long id) {
-            log.info("поступил запрос на получение данных пользователя");
-            return userService.deleteUser(id);
+    public ResponseEntity<?> deleteUser(@PathVariable("id") @Min(1) Long id) {
+        log.info("поступил запрос на получение данных пользователя");
+        return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
     }
-
-
 }

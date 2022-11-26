@@ -3,8 +3,8 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
+import ru.practicum.shareit.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
@@ -22,14 +22,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) throws ConflictException {
         User user = mapper.toUser(userDto);
-        return mapper.toUserDto(userStorage.createUser(user));
+        return mapper.toDto(userStorage.createUser(user));
     }
 
     @Override
     public UserDto updateUser(UserDto userDto, Long id) throws ConflictException {
         User user = mapper.toUser(userDto);
-        user.setIdUser(id);
-        return mapper.toUserDto(userStorage.updateUser(user, id));
+        user.setId(id);
+        return mapper.toDto(userStorage.updateUser(user, id));
     }
 
     @Override
@@ -37,18 +37,18 @@ public class UserServiceImpl implements UserService {
         Collection<User> list = userStorage.getAllUsers();
         List<UserDto> listDto = new ArrayList<>();
         for (User user : list) {
-            listDto.add(mapper.toUserDto(user));
+            listDto.add(mapper.toDto(user));
         }
         return listDto;
     }
 
     @Override
     public UserDto findUserById(Long id) {
-        return mapper.toUserDto(userStorage.getUser(id));
+        return mapper.toDto(userStorage.getUser(id));
     }
 
     @Override
     public UserDto deleteUser(Long id) {
-        return mapper.toUserDto(userStorage.deleteUser(id));
+        return mapper.toDto(userStorage.deleteUser(id));
     }
 }

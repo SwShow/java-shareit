@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class User {
 
-    private Long idUser;
+    private Long id;
 
     private String name;
 

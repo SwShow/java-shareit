@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
 
+@Slf4j
 @Repository
 public class ItemStorageImpl implements ItemStorage {
 
@@ -13,6 +15,7 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public Item createItem(Item item) {
+        log.info("создание вещи:" + item);
         item.setId(createId());
         items.put(item.getId(), item);
         return item;
@@ -34,10 +37,10 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
-    public List<Item> getItems(Long idUser) {
+    public List<Item> getItems(Long userId) {
         List<Item> list = new ArrayList<>();
         for (Item i : items.values()) {
-            if (i.getIdUser().equals(idUser)) list.add(i);
+            if (i.getUserId().equals(userId)) list.add(i);
         }
         return list;
     }

@@ -24,7 +24,7 @@ public class UserStorageImpl implements UserStorage {
             throw new ConflictException("адрес почты уже занят");
         }
         Long id = createId();
-        user.setIdUser(id);
+        user.setId(id);
         users.put(id, user);
         return user;
     }

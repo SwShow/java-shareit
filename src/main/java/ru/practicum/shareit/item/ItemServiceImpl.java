@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.UserStorage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -23,17 +24,20 @@ public class ItemServiceImpl implements ItemService {
     private final UserStorage userStorage;
 
     @Override
-    public ItemDto createItem(ItemDto itemDto, Long idUser) throws ValidationException {
-        if (userStorage.getUser(idUser) == null) {
-            throw new NoSuchElementException("пользователь не существует");
+    public ItemDto createItem(ItemDto itemDto, Optional<Long> userId) throws ValidationException {
+        if (userId.isPresent() && userId.get() > 0) {
+            if (userStorage.getUser(userId.get()) == null) {
+                throw new NoSuchElementException("пользователь не существует");
+            }
+            if (checkName(itemDto.getName()) && checkDescription(itemDto.getDescription())
+                    && itemDto.getAvailable() != null) {
+                Item item = mapper.toItem(itemDto);
+                item.setUserId(userId.get());
+                return mapper.toItemDto(itemStorage.createItem(item));
+            }
+            throw new ValidationException("У вещи неправильно заданы параметры:" + itemDto);
         }
-        if (checkName(itemDto.getName()) && checkDescription(itemDto.getDescription())
-                && itemDto.getAvailable() != null) {
-            Item item = mapper.toItem(itemDto);
-            item.setIdUser(idUser);
-            return mapper.toItemDto(itemStorage.createItem(item));
-        }
-        throw new ValidationException("У вещи неправильно заданы параметры:" + itemDto);
+        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
 
     public Boolean checkName(String name) throws ValidationException {
@@ -51,38 +55,51 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(Long idUser, Long itemId, ItemDto itemDto) {
-        Item item = mapper.toItem(itemDto);
-        log.info("вещь для редактирования:" + item);
-        if (itemStorage.getItemOfId(itemId).getIdUser().equals(idUser)) {
-            return mapper.toItemDto(itemStorage.updateItem(itemId, item));
+    public ItemDto updateItem(Optional<Long> userId, Long itemId, ItemDto itemDto) throws ValidationException {
+        if (userId.isPresent() && userId.get() > 0) {
+            Item item = mapper.toItem(itemDto);
+            log.info("вещь для редактирования:" + item);
+            if (itemStorage.getItemOfId(itemId).getUserId().equals(userId.get())) {
+                return mapper.toItemDto(itemStorage.updateItem(itemId, item));
+            }
+            throw new NoSuchElementException("нельзя редактировать чужие вещи!");
         }
-        throw new NoSuchElementException("нельзя редактировать чужие вещи!");
+        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
 
     @Override
-    public List<ItemDto> getItems(Long idUser) {
-        List<Item> its = itemStorage.getItems(idUser);
-        List<ItemDto> list = new ArrayList<>();
-        for (Item item : its) {
-            list.add(mapper.toItemDto(item));
+    public List<ItemDto> getItems(Optional<Long> userId) throws ValidationException {
+        if (userId.isPresent() && userId.get() > 0) {
+            List<Item> its = itemStorage.getItems(userId.get());
+            log.info("вещи пользователя:" + userId + its);
+            List<ItemDto> list = new ArrayList<>();
+            for (Item item : its) {
+                list.add(mapper.toItemDto(item));
+            }
+            return list;
         }
-        return list;
+        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
 
     @Override
-    public ItemDto getItemOfId(Long itemId) {
-        return mapper.toItemDto(itemStorage.getItemOfId(itemId));
+    public ItemDto getItemOfId(Long userId, Long itemId) throws ValidationException {
+        if (userId > 0 && itemId > 0) {
+            return mapper.toItemDto(itemStorage.getItemOfId(itemId));
+        }
+        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
 
     @Override
-    public List<ItemDto> getItemOfText(String text) {
-        if (text == null || text.length() == 0) return new ArrayList<>();
-        List<Item> its = itemStorage.getItemOfText(text);
-        List<ItemDto> list = new ArrayList<>();
-        for (Item item : its) {
-            list.add(mapper.toItemDto(item));
+    public List<ItemDto> getItemOfText(Optional<Long> userId, String text) throws ValidationException {
+        if (userId.isPresent() && userId.get() > 0) {
+            if (text == null || text.length() == 0) return new ArrayList<>();
+            List<Item> its = itemStorage.getItemOfText(text);
+            List<ItemDto> list = new ArrayList<>();
+            for (Item item : its) {
+                list.add(mapper.toItemDto(item));
+            }
+            return list;
         }
-        return list;
+        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
 }
