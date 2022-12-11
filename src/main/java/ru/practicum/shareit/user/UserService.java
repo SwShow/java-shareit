@@ -1,7 +1,5 @@
 package ru.practicum.shareit.user;
 
-import ru.practicum.shareit.exception.ConflictException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
@@ -9,6 +7,7 @@ import java.util.List;
 public interface UserService {
 
     UserDto createUser(UserDto userDto);
+
     UserDto updateUser(UserDto userDto, Long id) ;
 
     List<UserDto> findAllUsers();
