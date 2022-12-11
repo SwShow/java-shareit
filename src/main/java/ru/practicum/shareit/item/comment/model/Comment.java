@@ -37,7 +37,7 @@ public class Comment {
     @Column(name = "created")
     private LocalDateTime created;
 
-    public Comment (String text) {
+    public Comment(String text) {
         this.text = text;
     }
 }

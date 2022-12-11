@@ -28,7 +28,7 @@ public class ItemController {
 
     @PostMapping()
     public ResponseEntity<?> createItem(@RequestHeader(HEADER) Optional<Long> userId,
-                                       @Valid @RequestBody ItemDto itemDto) throws ValidationException {
+                                        @Valid @RequestBody ItemDto itemDto) throws ValidationException {
         log.info("поступил запрос на добавление вещи:" + itemDto + " пользователем:" + userId);
         return new ResponseEntity<>(itemService.createItem(itemDto, userId), HttpStatus.CREATED);
     }
@@ -62,10 +62,11 @@ public class ItemController {
         log.info("поступил запрос на просмотр доступной для аренды вещи:" + text);
         return new ResponseEntity<>(itemService.getItemOfText(userId, text), HttpStatus.OK);
     }
+
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<?> createComment(@Valid @RequestBody CommentDto commentDto,
-                                    @PathVariable Long itemId,
-                                    @RequestHeader(HEADER) long userId) {
+                                           @PathVariable Long itemId,
+                                           @RequestHeader(HEADER) long userId) {
         log.info("пользователь с id {} оставил отзыв на вещь с id {}: {}", userId, itemId, commentDto);
 
         return new ResponseEntity<>(itemService.createComment(commentDto, itemId, userId), HttpStatus.OK);

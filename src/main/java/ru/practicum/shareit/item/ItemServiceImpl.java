@@ -162,18 +162,21 @@ public class ItemServiceImpl implements ItemService {
 
         return CommentMapper.toCommentDto(commentRepository.save(comment), user);
     }
+
     public Booking bookingLast(Item item) {
         return bookingRepository.findAllByItemIdAndStartBeforeOrderByStartDesc(item.getId(), LocalDateTime.now())
                 .stream()
                 .min(Comparator.comparing(Booking::getEnd))
                 .orElse(null);
     }
+
     public Booking bookingNext(Item item) {
         return bookingRepository.findAllByItemIdAndStartAfterOrderByStartDesc(item.getId(), LocalDateTime.now())
                 .stream()
                 .max(Comparator.comparing(Booking::getStart))
                 .orElse(null);
     }
+
     List<CommentDto> commentDto(Item item) {
         return commentRepository.getAllByItemId(item.getId())
                 .stream()
