@@ -1,38 +1,40 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.model.User;
+import lombok.*;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
  */
-@Data
-@Builder
+@Getter
+@Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class ItemDto {
-    private Long id;
-    @NotBlank
+    private long id;
+    @NotEmpty
     private String name;
-    @NotBlank
+    @NotEmpty
     private String description;
+    @NotNull
     private Boolean available;
-    private Long idUser;
-    private User owner;
-    private ItemRequest request;
+    private BookingForItemDto lastBooking;
+    private BookingForItemDto nextBooking;
+    @ToString.Exclude
+    List<CommentDto> comments;
 
-    public ItemDto(Long id, String name, String description, Boolean available) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BookingForItemDto {
+        private Long id;
+        private LocalDateTime start;
+        private LocalDateTime end;
+        private Long bookerId;
     }
+
 }
