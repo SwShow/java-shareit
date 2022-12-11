@@ -1,13 +1,13 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.ItemStorage;
 
 import java.util.*;
 
 @Slf4j
-@Repository
+//@Repository
 public class ItemStorageImpl implements ItemStorage {
 
     private final Map<Long, Item> items = new HashMap<>();
@@ -40,7 +40,7 @@ public class ItemStorageImpl implements ItemStorage {
     public List<Item> getItems(Long userId) {
         List<Item> list = new ArrayList<>();
         for (Item i : items.values()) {
-            if (i.getUserId().equals(userId)) list.add(i);
+            if (i.getId() == (userId)) list.add(i);
         }
         return list;
     }

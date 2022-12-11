@@ -3,15 +3,16 @@
     import org.apache.catalina.connector.Response;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
-    import org.springframework.web.bind.annotation.ControllerAdvice;
     import org.springframework.web.bind.annotation.ExceptionHandler;
     import lombok.extern.slf4j.Slf4j;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+    import org.springframework.web.bind.annotation.RestControllerAdvice;
 
     import java.sql.SQLException;
     import java.util.NoSuchElementException;
 
     @Slf4j
-    @ControllerAdvice
+    @RestControllerAdvice
     public class ErrorHandler {
 
         @ExceptionHandler(ValidationException.class)
@@ -46,5 +47,11 @@
         public ResponseEntity<Response> handleException (SQLException e){
             log.info("SQLException! {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        @ExceptionHandler
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        public ErrorResponse handleException(final BadRequestException e) {
+            log.error("BAD_REQUEST", e);
+            return new ErrorResponse(e.getMessage());
         }
     }

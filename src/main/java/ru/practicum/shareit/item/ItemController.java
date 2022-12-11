@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 /**
@@ -21,18 +23,19 @@ import java.util.Optional;
 @RequestMapping("/items")
 public class ItemController {
 
+    private static final String HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @PostMapping()
-    public ResponseEntity<?> createItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
-                                        @RequestBody ItemDto itemDto) throws ValidationException {
+    public ResponseEntity<?> createItem(@RequestHeader(HEADER) Optional<Long> userId,
+                                       @Valid @RequestBody ItemDto itemDto) throws ValidationException {
         log.info("поступил запрос на добавление вещи:" + itemDto + " пользователем:" + userId);
         return new ResponseEntity<>(itemService.createItem(itemDto, userId), HttpStatus.CREATED);
     }
 
     // только для владельца
     @PatchMapping("/{itemId}")
-    public ResponseEntity<?> updateItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId, @PathVariable Long itemId,
+    public ResponseEntity<?> updateItem(@RequestHeader(HEADER) Optional<Long> userId, @PathVariable Long itemId,
                                         @RequestBody ItemDto itemDto) throws ValidationException {
         log.info("поступил запрос на редактирование вещи:" + itemDto + " владельцем:" + userId);
         return new ResponseEntity<>(itemService.updateItem(userId, itemId, itemDto), HttpStatus.OK);
@@ -40,23 +43,31 @@ public class ItemController {
 
     // для любого пользователя
     @GetMapping("/{itemId}")
-    public ResponseEntity<?> getItemOfId(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) throws ValidationException {
+    public ResponseEntity<?> getItemOfId(@RequestHeader(HEADER) Long userId, @PathVariable Long itemId) throws ValidationException {
         log.info("поступил запрос на просмотр вещи по идентификатору:" + itemId);
         return new ResponseEntity<>(itemService.getItemOfId(userId, itemId), HttpStatus.OK);
     }
 
     // только для владельца
     @GetMapping()
-    public ResponseEntity<?> getItems(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId) throws ValidationException {
+    public ResponseEntity<?> getItems(@RequestHeader(HEADER) Optional<Long> userId) throws ValidationException {
         log.info("поступил запрос на просмотр владельцем всех своих вещей,idUser=" + userId);
         return new ResponseEntity<>(itemService.getItems(userId), HttpStatus.OK);
     }
 
     // только доступные для аренды вещи
     @GetMapping("/search")
-    public ResponseEntity<?> getItemOfText(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
+    public ResponseEntity<?> getItemOfText(@RequestHeader(HEADER) Optional<Long> userId,
                                            @RequestParam("text") String text) throws ValidationException {
         log.info("поступил запрос на просмотр доступной для аренды вещи:" + text);
         return new ResponseEntity<>(itemService.getItemOfText(userId, text), HttpStatus.OK);
+    }
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<?> createComment(@Valid @RequestBody CommentDto commentDto,
+                                    @PathVariable Long itemId,
+                                    @RequestHeader(HEADER) long userId) {
+        log.info("пользователь с id {} оставил отзыв на вещь с id {}: {}", userId, itemId, commentDto);
+
+        return new ResponseEntity<>(itemService.createComment(commentDto, itemId, userId), HttpStatus.OK);
     }
 }

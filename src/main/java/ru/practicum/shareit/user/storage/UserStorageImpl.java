@@ -1,12 +1,12 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.storage;
 
-import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.*;
 
-@Repository
+//@Repository
 public class UserStorageImpl implements UserStorage {
 
     private Long id = 0L;

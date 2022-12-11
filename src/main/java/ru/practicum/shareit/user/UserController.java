@@ -28,14 +28,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping()
-    public ResponseEntity<?> create(@Valid @RequestBody UserDto userDto) throws ValidationException, ConflictException {
-        log.info("поступил запрос на создание пользователя");
+    public ResponseEntity<?> create(@Valid @RequestBody UserDto userDto)  {
+        log.info("поступил запрос на создание пользователя" + userDto);
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") @Min(1) Long id, @RequestBody UserDto userDto)
-            throws ConflictException {
+    public ResponseEntity<?> updateUser(@PathVariable("id") @Min(1) Long id, @RequestBody UserDto userDto) {
         log.info("поступил запрос на изменение данных пользователя");
         return new ResponseEntity<>(userService.updateUser(userDto, id), HttpStatus.OK);
     }
@@ -55,6 +54,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") @Min(1) Long id) {
         log.info("поступил запрос на получение данных пользователя");
-        return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
+        userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
