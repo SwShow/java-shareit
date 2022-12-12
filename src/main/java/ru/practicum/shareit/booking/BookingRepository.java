@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.booking.model.Booking;
 
 
 import java.time.LocalDateTime;
@@ -25,19 +26,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByItemOwnerIdAndStartAfterOrderByStartDesc(long ownerId, LocalDateTime now);
 
-    @Query("select b from Booking b " +
-            "where b.item.owner.id = ?1 and " +
-            "b.start < ?2 and " +
-            "b.end > ?2 " +
-            "order by b.start desc")
-    List<Booking> findCurrentOwnerBookings(long ownerId, LocalDateTime now);
-
-    @Query("select b from Booking b " +
-            "where b.booker.id = ?1 and " +
-            "b.start < ?2 and " +
-            "b.end > ?2 " +
-            "order by b.start desc")
-    List<Booking> findCurrentBookerBookings(long bookerId, LocalDateTime now);
+    Long countAllByItemIdAndBookerIdAndEndBefore(long itemId, long userId, LocalDateTime now);
 
     List<Booking> findAllByItemIdAndStartBeforeOrderByStartDesc(long itemId, LocalDateTime now);
 
@@ -56,5 +45,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by b.start desc")
     List<Booking> findFutureOwnerBookings(long itemId, long ownerId, LocalDateTime now);
 
-    Long countAllByItemIdAndBookerIdAndEndBefore(long itemId, long userId, LocalDateTime now);
+    @Query("select b from Booking b " +
+            "where b.booker.id = ?1 and " +
+            "b.start < ?2 and " +
+            "b.end > ?2 " +
+            "order by b.start desc")
+    List<Booking> findCurrentBookerBookings(long bookerId, LocalDateTime now);
+
+    @Query("select b from Booking b " +
+            "where b.item.owner.id = ?1 and " +
+            "b.start < ?2 and " +
+            "b.end > ?2 " +
+            "order by b.start desc")
+    List<Booking> findCurrentOwnerBookings(long ownerId, LocalDateTime now);
 }

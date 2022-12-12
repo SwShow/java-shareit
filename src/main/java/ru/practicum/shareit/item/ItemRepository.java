@@ -12,7 +12,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "where i.available = true and" +
             " (upper(i.name) like upper(concat('%', ?1, '%')) " +
             "  or upper(i.description) like upper(concat('%', ?1, '%')))")
-    List<Item> search(String text1, String text2);
+    List<Item> search(String text);
 
     List<Item> findAllByOwnerId(long ownerId);
 }

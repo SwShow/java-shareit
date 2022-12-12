@@ -3,7 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
@@ -45,7 +45,6 @@ public class ItemServiceImpl implements ItemService {
         }
         throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
-
 
     @Override
     public ItemDto updateItem(Optional<Long> userId, Long itemId, ItemDto itemDto) throws ValidationException {
@@ -119,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getItemOfText(Optional<Long> userId, String text) throws ValidationException {
         if (userId.isPresent() && userId.get() > 0) {
             if (text == null || text.length() == 0) return new ArrayList<>();
-            List<Item> its = itemRepository.search(text, text);
+            List<Item> its = itemRepository.search(text);
             return getItemDto(its);
         }
         throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");

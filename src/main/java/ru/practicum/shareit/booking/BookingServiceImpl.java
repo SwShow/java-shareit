@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
@@ -94,7 +95,7 @@ public class BookingServiceImpl implements BookingService {
         userRepository.findById(bookerId)
                 .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + bookerId + " не существует"));
 
-        return findBookings(false, state, bookerId)
+        return findBookingsForBooking(state, bookerId)
                 .stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
@@ -108,23 +109,18 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("у вас нет вещей");
         }
 
-        return findBookings(true, state, ownerId)
+        return findBookingsForOwner(state, ownerId)
                 .stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
-    public List<Booking> findBookings(boolean isOwner, String state, long id) {
+    public List<Booking> findBookingsForOwner(String state, long id) {
         List<Booking> bookings;
 
         switch (state) {
-
             case "ALL":
-                if (isOwner) {
-                    bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(id);
-                } else {
-                    bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(id);
-                }
+                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(id);
                 return bookings;
             case "WAITING":
             case "APPROVED":
@@ -137,38 +133,52 @@ public class BookingServiceImpl implements BookingService {
                         status = value;
                     }
                 }
-
-                if (isOwner) {
-                    bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(id, status);
-                } else {
-                    bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(id, status);
-                }
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(id, status);
                 break;
-
             case "PAST":
-                if (isOwner) {
-                    bookings = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(id, LocalDateTime.now());
-                } else {
-                    bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(id, LocalDateTime.now());
-                }
+                bookings = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(id, LocalDateTime.now());
                 break;
-
             case "FUTURE":
-                if (isOwner) {
-                    bookings = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(id, LocalDateTime.now());
-                } else {
-                    bookings = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(id, LocalDateTime.now());
-                }
+                bookings = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(id, LocalDateTime.now());
                 break;
-
             case "CURRENT":
-                if (isOwner) {
-                    bookings = bookingRepository.findCurrentOwnerBookings(id, LocalDateTime.now());
-                } else {
-                    bookings = bookingRepository.findCurrentBookerBookings(id, LocalDateTime.now());
-                }
+                bookings = bookingRepository.findCurrentOwnerBookings(id, LocalDateTime.now());
                 break;
 
+            default:
+                throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
+        }
+        return bookings;
+    }
+
+    public List<Booking> findBookingsForBooking(String state, long id) {
+        List<Booking> bookings;
+
+        switch (state) {
+            case "ALL":
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(id);
+                return bookings;
+            case "WAITING":
+            case "APPROVED":
+            case "REJECTED":
+            case "CANCELED":
+                BookingStatus status = null;
+                for (BookingStatus value : BookingStatus.values()) {
+                    if (value.name().equals(state)) {
+                        status = value;
+                    }
+                }
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(id, status);
+                break;
+            case "PAST":
+                bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(id, LocalDateTime.now());
+                break;
+            case "FUTURE":
+                bookings = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(id, LocalDateTime.now());
+                break;
+            case "CURRENT":
+                bookings = bookingRepository.findCurrentBookerBookings(id, LocalDateTime.now());
+                break;
             default:
                 throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
