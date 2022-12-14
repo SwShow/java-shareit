@@ -1,29 +1,17 @@
 package ru.practicum.shareit.booking.dto;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.user.dto.UserMapper;
 
+@Mapper
+public interface BookingMapper {
 
-import java.util.ArrayList;
+    @Mapping(target = "itemId", ignore = true)
+    BookingDto toBookingDto(Booking booking);
 
-public class BookingMapper {
-    public static BookingDto toBookingDto(Booking booking) {
-        return new BookingDto(
-                booking.getId(),
-                booking.getItem().getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                ItemMapper.toItemDto(booking.getItem(), null, null, new ArrayList<>()),
-                UserMapper.INSTANCE.toDto(booking.getBooker()),
-                booking.getStatus());
-    }
-
-    public static Booking toBooking(BookingDto bookingDto) {
-        return new Booking(
-                bookingDto.getStart(),
-                bookingDto.getEnd(),
-                BookingStatus.WAITING);
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "booker", ignore = true)
+    Booking toBooking(BookingDto bookingDto);
 }

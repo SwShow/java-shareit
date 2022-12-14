@@ -1,27 +1,19 @@
 package ru.practicum.shareit.item.comment.dto;
 
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.shareit.item.comment.model.Comment;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
-public class CommentMapper {
-    public static Comment toComment(CommentDto commentDto, Item item, User user) {
-        return new Comment(
-                0,
-                commentDto.getText(),
-                item,
-                user,
-                commentDto.getCreated()
-        );
-    }
+@Mapper
+public interface CommentMapper {
 
-    public static CommentDto toCommentDto(Comment comment, User user) {
-        return new CommentDto(
-                comment.getId(),
-                comment.getText(),
-                user.getName(),
-                comment.getCreated()
-        );
-    }
+    @Mapping(target = "authorName", source = "author.name")
+    CommentDto toCommentDto(Comment comment);
 
+    Comment toComment(CommentDtoLittle commentDto);
 }
+
+
+
+

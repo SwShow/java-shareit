@@ -1,15 +1,23 @@
 package ru.practicum.shareit.item.dto;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
-public class ItemMapper {
+@Mapper
+public abstract class ItemMapper {
+
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "request", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    public abstract Item toItem(ItemDto itemDto);
 
 
-    public static ItemDto toItemDto(Item item, Booking lastBooking, Booking nextBooking, List<CommentDto> comments) {
+    public ItemDto toItemDto(Item item, Booking lastBooking, Booking nextBooking, List<CommentDto> comments) {
         ItemDto.BookingForItemDto lastBookingToAdd = null;
         ItemDto.BookingForItemDto nextBookingToAdd = null;
 
@@ -39,17 +47,6 @@ public class ItemMapper {
                 lastBookingToAdd,
                 nextBookingToAdd,
                 comments
-        );
-    }
-
-    public static Item toItem(ItemDto item) {
-        return new Item(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable(),
-                null,
-                null
         );
     }
 }

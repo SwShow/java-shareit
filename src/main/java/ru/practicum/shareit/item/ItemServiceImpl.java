@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.CommentRepository;
+import ru.practicum.shareit.item.comment.dto.CommentDtoLittle;
 import ru.practicum.shareit.item.comment.dto.CommentMapper;
 import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -31,6 +32,8 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
+    private final CommentMapper commentMapper;
+    private final ItemMapper itemMapper;
 
 
     @Override
@@ -39,9 +42,10 @@ public class ItemServiceImpl implements ItemService {
             if (userRepository.findById(userId.get()).isEmpty()) {
                 throw new NoSuchElementException("пользователь не существует");
             }
-            Item item = ItemMapper.toItem(itemDto);
+            Item item = itemMapper.toItem(itemDto);
             item.setOwner(userRepository.findById(userId.get()).get());
-            return ItemMapper.toItemDto(itemRepository.save(item), null, null, new ArrayList<>());
+            item.setComments(new ArrayList<>());
+            return itemMapper.toItemDto(itemRepository.save(item), null, null, new ArrayList<>());
         }
         throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
@@ -68,8 +72,7 @@ public class ItemServiceImpl implements ItemService {
                 Booking nextBooking = bookingNext(item);
 
                 List<CommentDto> commentsDto = commentDto(item);
-
-                return ItemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto);
+                return itemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto);
             }
             throw new NoSuchElementException("нельзя редактировать чужие вещи!");
         }
@@ -105,11 +108,8 @@ public class ItemServiceImpl implements ItemService {
                     .max(Comparator.comparing(Booking::getStart))
                     .orElse(null);
 
-            List<CommentDto> commentsDto = commentRepository.getAllByItemId(itemId).stream()
-                    .map(comment -> CommentMapper.toCommentDto(comment, comment.getAuthor()))
-                    .collect(Collectors.toList());
-
-            return ItemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto);
+            List<CommentDto> commentsDto = commentDto(item);
+            return itemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto);
         }
         throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
@@ -132,15 +132,17 @@ public class ItemServiceImpl implements ItemService {
             Booking nextBooking = bookingNext(item);
 
             List<CommentDto> commentsDto = commentDto(item);
-
-            list.add(ItemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto));
+            item.setLastBooking(lastBooking);
+            item.setNextBooking(nextBooking);
+            item.setComments(commentsDto);
+            list.add(itemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto));
         }
         return list;
     }
 
     @Override
-    public CommentDto createComment(CommentDto commentDto, Long itemId, long userId) {
-        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
+    public CommentDto createComment(CommentDtoLittle commentDtoLittle, Long itemId, long userId) {
+        if (commentDtoLittle.getText() == null || commentDtoLittle.getText().equals("")) {
             throw new ValidationException("отзыв не может быть пустым");
         }
 
@@ -152,12 +154,12 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NoSuchElementException("вещь c идентификатором " + itemId + " не существует"));
-
         User user = UserMapper.INSTANCE.toUser(userService.findUserById(userId));
-        Comment comment = CommentMapper.toComment(commentDto, item, user);
+        Comment comment = commentMapper.toComment(commentDtoLittle);
+        comment.setItem(item);
+        comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
-
-        return CommentMapper.toCommentDto(commentRepository.save(comment), user);
+        return commentMapper.toCommentDto(commentRepository.save(comment));
     }
 
     public Booking bookingLast(Item item) {
@@ -174,10 +176,10 @@ public class ItemServiceImpl implements ItemService {
                 .orElse(null);
     }
 
-    List<CommentDto> commentDto(Item item) {
+    public List<CommentDto> commentDto(Item item) {
         return commentRepository.getAllByItemId(item.getId())
                 .stream()
-                .map(comment -> CommentMapper.toCommentDto(comment, comment.getAuthor()))
+                .map(commentMapper::toCommentDto)
                 .collect(Collectors.toList());
     }
 

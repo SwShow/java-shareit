@@ -4,6 +4,7 @@ package ru.practicum.shareit.booking.model;
  * TODO Sprint add-bookings.
  */
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "bookings")
 public class Booking {
     @Id
@@ -31,20 +33,15 @@ public class Booking {
     @Column(name = "end_date")
     private LocalDateTime end;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "booker_id", referencedColumnName = "id")
     private User booker;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
-    public Booking(LocalDateTime start, LocalDateTime end, BookingStatus status) {
-        this.start = start;
-        this.end = end;
-        this.status = status;
-    }
 }

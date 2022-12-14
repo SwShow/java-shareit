@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.booking.BookingStatus.APPROVED;
-import static ru.practicum.shareit.booking.BookingStatus.REJECTED;
+import static ru.practicum.shareit.booking.BookingStatus.*;
 
 
 @Service
@@ -30,13 +29,13 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingMapper bookingMapper;
 
     @Override
     public BookingDto save(BookingDto bookingDto, long userId) {
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NoSuchElementException("вещь с id " + bookingDto.getItemId() + " не найдена"));
-        User booker = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + userId + " не существует."));
+        User booker = getUser(userId);
         if (item.getOwner().getId() == userId) {
             throw new NoSuchElementException("это ваша вещь");
         }
@@ -45,20 +44,20 @@ public class BookingServiceImpl implements BookingService {
                 bookingDto.getStart().isBefore(LocalDateTime.now())) {
             throw new ValidationException("время бронирования указано не корректно");
         }
-        Booking booking = BookingMapper.toBooking(bookingDto);
+        bookingDto.setStatus(WAITING);
+        Booking booking = bookingMapper.toBooking(bookingDto);
         booking.setItem(item);
         booking.setBooker(booker);
         if (!booking.getItem().getAvailable()) {
             throw new ValidationException("вещь не доступна для бронирования");
         }
 
-        return BookingMapper.toBookingDto(bookingRepository.save(booking));
+        return bookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
     public BookingDto approve(long userId, long bookingId, boolean status) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + userId + " не существует"));
+        getUser(userId);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("указанное бронирование не существует"));
         if (booking.getItem().getOwner().getId() != userId) {
@@ -68,14 +67,12 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("вы уже подтвердили бронирование");
         }
         booking.setStatus(status ? APPROVED : REJECTED);
-
-        return BookingMapper.toBookingDto(bookingRepository.save(booking));
+        return bookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
     public BookingDto getById(long bookingId, long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + userId + " не существует"));
+        getUser(userId);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("указанное бронирование не существует"));
         long id = booking.getItem().getId();
@@ -87,32 +84,35 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
-        return BookingMapper.toBookingDto(booking);
+        return bookingMapper.toBookingDto(booking);
     }
 
     @Override
     public List<BookingDto> findAllForBooker(long bookerId, String state) {
-        userRepository.findById(bookerId)
-                .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + bookerId + " не существует"));
+        getUser(bookerId);
 
         return findBookingsForBooking(state, bookerId)
                 .stream()
-                .map(BookingMapper::toBookingDto)
+                .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<BookingDto> findAllForOwner(long ownerId, String state) {
-        userRepository.findById(ownerId)
-                .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + ownerId + " не существует"));
+        getUser(ownerId);
         if (itemRepository.findAllByOwnerId(ownerId).isEmpty()) {
             throw new ValidationException("у вас нет вещей");
         }
 
         return findBookingsForOwner(state, ownerId)
                 .stream()
-                .map(BookingMapper::toBookingDto)
+                .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + userId + " не существует."));
     }
 
     public List<Booking> findBookingsForOwner(String state, long id) {

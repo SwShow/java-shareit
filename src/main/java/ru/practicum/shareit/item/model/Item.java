@@ -24,10 +24,9 @@ import java.util.List;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private long id;
 
-    @Column(nullable = false, length = 255)
+    private long id;
+    @Column
     private String name;
     private String description;
     private Boolean available;
@@ -47,12 +46,5 @@ public class Item {
     @Transient
     private List<CommentDto> comments;
 
-    public Item(long id, String name, String description, Boolean available, User owner, ItemRequest request) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-        this.owner = owner;
-        this.request = request;
-    }
+
 }

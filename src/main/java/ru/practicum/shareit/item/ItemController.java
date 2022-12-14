@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.dto.CommentDtoLittle;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
@@ -63,11 +63,11 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<?> createComment(@Valid @RequestBody CommentDto commentDto,
+    public ResponseEntity<?> createComment(@Valid @RequestBody CommentDtoLittle commentDtoLittle,
                                            @PathVariable Long itemId,
                                            @RequestHeader("X-Sharer-User-Id") long userId) {
-        log.info("пользователь с id {} оставил отзыв на вещь с id {}: {}", userId, itemId, commentDto);
+        log.info("пользователь с id {} оставил отзыв на вещь с id {}: {}", userId, itemId, commentDtoLittle);
 
-        return new ResponseEntity<>(itemService.createComment(commentDto, itemId, userId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.createComment(commentDtoLittle, itemId, userId), HttpStatus.OK);
     }
 }
