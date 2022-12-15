@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.dto.CommentDtoLittle;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
@@ -16,4 +18,6 @@ public interface ItemService {
     List<ItemDto> getItems(Optional<Long> userId) throws ValidationException;
 
     List<ItemDto> getItemOfText(Optional<Long> userId, String text) throws ValidationException;
+
+    CommentDto createComment(CommentDtoLittle commentDtoLittle, Long itemId, long userId);
 }

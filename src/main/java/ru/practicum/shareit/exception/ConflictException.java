@@ -1,8 +1,8 @@
 package ru.practicum.shareit.exception;
 
-public class ConflictException extends Exception{
+public class ConflictException extends Exception {
 
-    public ConflictException(final String message) {
+    public ConflictException(String message) {
         super(message);
     }
 

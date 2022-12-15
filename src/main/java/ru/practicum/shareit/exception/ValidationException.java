@@ -1,8 +1,8 @@
 package ru.practicum.shareit.exception;
 
-public class ValidationException extends Exception{
+public class ValidationException extends RuntimeException {
 
-    public ValidationException(final String message) {
+    public ValidationException(String message) {
         super(message);
     }
 

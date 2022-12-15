@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.comment.dto.CommentDtoLittle;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 /**
@@ -25,7 +27,7 @@ public class ItemController {
 
     @PostMapping()
     public ResponseEntity<?> createItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
-                                        @RequestBody ItemDto itemDto) throws ValidationException {
+                                        @Valid @RequestBody ItemDto itemDto) throws ValidationException {
         log.info("поступил запрос на добавление вещи:" + itemDto + " пользователем:" + userId);
         return new ResponseEntity<>(itemService.createItem(itemDto, userId), HttpStatus.CREATED);
     }
@@ -58,5 +60,14 @@ public class ItemController {
                                            @RequestParam("text") String text) throws ValidationException {
         log.info("поступил запрос на просмотр доступной для аренды вещи:" + text);
         return new ResponseEntity<>(itemService.getItemOfText(userId, text), HttpStatus.OK);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<?> createComment(@Valid @RequestBody CommentDtoLittle commentDtoLittle,
+                                           @PathVariable Long itemId,
+                                           @RequestHeader("X-Sharer-User-Id") long userId) {
+        log.info("пользователь с id {} оставил отзыв на вещь с id {}: {}", userId, itemId, commentDtoLittle);
+
+        return new ResponseEntity<>(itemService.createComment(commentDtoLittle, itemId, userId), HttpStatus.OK);
     }
 }
