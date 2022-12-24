@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.CommentDtoLittle;
 import ru.practicum.shareit.item.comment.dto.CommentMapper;
@@ -17,8 +16,6 @@ import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequestController;
-import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -41,13 +38,7 @@ class ItemControllerTest {
     @Autowired
     private UserController userController;
     @Autowired
-    private ItemRequestController requestController;
-    @Autowired
     private BookingController bookingController;
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private ItemService itemService;
     @Autowired
             private ItemMapper itemMapper;
     @Autowired
@@ -59,8 +50,6 @@ class ItemControllerTest {
             null, new ArrayList<>(), 0L);
 
     UserDto userDto = new UserDto(0L, "user_name", "username@email.com");
-
-    ItemRequestDto requestDto = new ItemRequestDto(0L, "description");
 
     CommentDtoLittle comment = new CommentDtoLittle("comment", 0L, 0L);
 
