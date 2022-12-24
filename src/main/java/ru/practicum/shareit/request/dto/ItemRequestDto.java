@@ -21,4 +21,7 @@ public class ItemRequestDto {
     private LocalDateTime created;
     private List<ItemDto> items;
 
+    public ItemRequestDto(long id, String description) {
+
+    }
 }
