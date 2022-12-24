@@ -13,6 +13,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
     private long id;
@@ -26,6 +27,7 @@ public class ItemDto {
     private BookingForItemDto nextBooking;
     @ToString.Exclude
     List<CommentDto> comments;
+    private Long requestId;
 
     @Data
     @NoArgsConstructor

@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -36,7 +36,7 @@ public class Item {
     private User owner;
 
     @ManyToOne
-    @JoinColumn(name = "requests_id", referencedColumnName = "id")
+    @JoinColumn(name = "request_id", referencedColumnName = "id")
     private ItemRequest request;
 
     @Transient
@@ -45,6 +45,5 @@ public class Item {
     private Booking nextBooking;
     @Transient
     private List<CommentDto> comments;
-
 
 }

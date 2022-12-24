@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -23,27 +24,27 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping()
-    public ResponseEntity<?> create(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto) {
         log.info("поступил запрос на создание пользователя" + userDto);
-        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
+        return ResponseEntity.ok(userService.createUser(userDto));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") @Min(1) Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable("id") @Min(1) Long id, @RequestBody UserDto userDto) {
         log.info("поступил запрос на изменение данных пользователя");
-        return new ResponseEntity<>(userService.updateUser(userDto, id), HttpStatus.OK);
+        return ResponseEntity.ok(userService.updateUser(userDto, id));
     }
 
     @GetMapping()
-    public ResponseEntity<?> findAllUsers() {
+    public ResponseEntity<List<UserDto>> findAllUsers() {
         log.info("поступил запрос на получение данных всех пользователей");
-        return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findUserById(@PathVariable("id") @Min(1) Long id) {
+    public ResponseEntity<UserDto> findUserById(@PathVariable("id") @Min(1) Long id) {
         log.info("поступил запрос на получение данных пользователя");
-        return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
+        return ResponseEntity.ok(userService.findUserById(id));
     }
 
     @DeleteMapping("/{id}")

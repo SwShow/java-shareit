@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -88,23 +89,23 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllForBooker(long bookerId, String state) {
+    public List<BookingDto> findAllForBooker(PageRequest pageRequest, long bookerId, String state) {
         getUser(bookerId);
 
-        return findBookingsForBooking(state, bookerId)
+        return findBookingsForBooking(state, bookerId, pageRequest)
                 .stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDto> findAllForOwner(long ownerId, String state) {
+    public List<BookingDto> findAllForOwner(PageRequest pageRequest, long ownerId, String state) {
         getUser(ownerId);
         if (itemRepository.findAllByOwnerId(ownerId).isEmpty()) {
             throw new ValidationException("у вас нет вещей");
         }
 
-        return findBookingsForOwner(state, ownerId)
+        return findBookingsForOwner(state, ownerId, pageRequest)
                 .stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
@@ -115,12 +116,12 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + userId + " не существует."));
     }
 
-    public List<Booking> findBookingsForOwner(String state, long id) {
+    public List<Booking> findBookingsForOwner(String state, long id, PageRequest pageRequest) {
         List<Booking> bookings;
 
         switch (state) {
             case "ALL":
-                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(id);
+                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(id, pageRequest);
                 return bookings;
             case "WAITING":
             case "APPROVED":
@@ -151,12 +152,12 @@ public class BookingServiceImpl implements BookingService {
         return bookings;
     }
 
-    public List<Booking> findBookingsForBooking(String state, long id) {
+    public List<Booking> findBookingsForBooking(String state, long id, PageRequest pageRequest) {
         List<Booking> bookings;
 
         switch (state) {
             case "ALL":
-                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(id);
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(id, pageRequest);
                 return bookings;
             case "WAITING":
             case "APPROVED":

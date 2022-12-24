@@ -11,6 +11,10 @@ public interface CommentMapper {
     @Mapping(target = "authorName", source = "author.name")
     CommentDto toCommentDto(Comment comment);
 
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "created", ignore = true)
+    @Mapping(target = "author", ignore = true)
     Comment toComment(CommentDtoLittle commentDto);
 }
 
