@@ -29,19 +29,19 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-   /* @ExceptionHandler
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(NullPointerException e) {
         log.info("NullPointerException! {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
-    }*/
+    }
 
-   /* @ExceptionHandler
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(RuntimeException e) {
         log.info("RuntimeException! {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
-    }*/
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -50,16 +50,16 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-   /* @ExceptionHandler
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(SQLException e) {
         log.info("SQLException! {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
-    }*/
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleException(final BadRequestException e) {
+    public ErrorResponse handleException(BadRequestException e) {
         log.error("BAD_REQUEST", e);
         return new ErrorResponse(e.getMessage());
     }

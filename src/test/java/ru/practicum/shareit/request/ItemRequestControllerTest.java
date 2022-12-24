@@ -27,7 +27,6 @@ class ItemRequestControllerTest {
     ItemRequestDto itemRequestDto = new ItemRequestDto(0L, "description", null, new ArrayList<>());
     UserDto userDto = new UserDto(0L, "user_name", "username@yandex.ru");
 
-
     @Test
     void addItemRequest() {
         UserDto userDto1 = userController.create(userDto).getBody();

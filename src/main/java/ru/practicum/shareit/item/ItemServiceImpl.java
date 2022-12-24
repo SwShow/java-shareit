@@ -41,22 +41,29 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto createItem(ItemDto itemDto, Optional<Long> userId) throws ValidationException {
-        long requestId = itemDto.getRequestId();
+        Optional<Long> requestId = Optional.ofNullable(itemDto.getRequestId());
+        log.info("requestId:" + requestId);
         ItemRequest request = null;
 
-        if (requestId != 0L) {
-            request = itemRequestRepository.findById(requestId).get();
+        if (requestId.isPresent()) {
+            request = itemRequestRepository.findById(requestId.get()).get();
         }
 
+        log.info("request:" + request);
+        if (userId.isPresent() && userId.get() > 0) {
             if (userRepository.findById(userId.get()).isEmpty()) {
                 throw new NoSuchElementException("пользователь не существует");
             }
             Item item = itemMapper.toItem(itemDto);
+            log.info("item:" + item);
             item.setOwner(userRepository.findById(userId.get()).get());
             item.setRequest(request);
             Item item1 = itemRepository.save(item);
+            log.info("item:" + item1);
             return itemMapper.toItemDto(item1);
         }
+        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
+    }
 
     @Override
     public ItemDto updateItem(Optional<Long> userId, Long itemId, ItemDto itemDto) throws ValidationException {

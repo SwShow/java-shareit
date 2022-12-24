@@ -1,80 +1,78 @@
 package ru.practicum.shareit.user;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.http.HttpStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ExtendWith(MockitoExtension.class)
 class UserControllerTest {
-    @Autowired
-    private UserController userController;
-
-    UserDto user = new UserDto(0L, "User_name", "username@yandex.ru");
+    @InjectMocks
+    UserController userController;
+    @Mock
+    private UserService userService;
+    private final UserDto userDto = new UserDto(0L, "test","test@mail.com");
+    private final UserDto userDto1 = new UserDto(1L, "test","test@mail.com");
+    private final UserDto userDto2 = new UserDto(1L, "update", "update@mail.ru");
 
     @Test
-    void createAndFindUserById() {
+    public void createUser() {
 
-        ResponseEntity<UserDto> entity = userController.create(user);
-        UserDto dto = entity.getBody();
-        assertEquals(OK, entity.getStatusCode());
-        assert dto != null;
-        ResponseEntity<UserDto> entity1 = userController.findUserById(dto.getId());
-        UserDto dto1 =  entity1.getBody();
-        assertEquals(OK, entity1.getStatusCode());
-        assert dto1 != null;
-        assertEquals(dto.getId(), dto1.getId());
+        when(userService.createUser(any()))
+                .thenReturn(userDto1);
+
+        ResponseEntity<UserDto>  res = userController.create(userDto);
+        assertThat(res.getStatusCodeValue()).isEqualTo(200);
+        assertThat(Objects.requireNonNull(res.getBody()).getId()).isEqualTo(1);
 
     }
 
-    @Test
-    void updateUser() {
-        ResponseEntity<UserDto> entity1 = userController.create(user);
-        UserDto dto = entity1.getBody();
-        assert dto != null;
-        dto.setName("Update_name");
-        dto.setEmail("updatename@mail.com");
-        ResponseEntity<UserDto> entity = userController.updateUser(dto.getId(), dto);
-        UserDto dto1 = entity.getBody();
-        assertEquals(OK, entity.getStatusCode());
-        assert dto1 != null;
-        assertEquals(1L, dto1.getId());
-        assertEquals("Update_name", dto1.getName());
-        assertEquals("updatename@mail.com", dto1.getEmail());
+   @Test
+    public void updateUser() {
+       when(userService.updateUser(userDto1, 1L))
+               .thenReturn(userDto2);
+
+       ResponseEntity<UserDto>  res = userController.updateUser(1L, userDto1);
+       assertThat(res.getStatusCodeValue()).isEqualTo(200);
+       assertThat(Objects.requireNonNull(res.getBody()).getId()).isEqualTo(1);
+       assertThat(Objects.requireNonNull(res.getBody()).getName()).isEqualTo(userDto2.getName());
     }
 
     @Test
-    void deleteUser() {
-        ResponseEntity<UserDto> entity = userController.create(user);
-        UserDto dto = entity.getBody();
-        ResponseEntity<List<UserDto>> list = userController.findAllUsers();
-        assertEquals(OK, list.getStatusCode());
-        assertEquals(1, Objects.requireNonNull(list.getBody()).size());
-        assert dto != null;
-        ResponseEntity<?> del = userController.deleteUser(dto.getId());
-        assertEquals(OK, del.getStatusCode());
-        ResponseEntity<List<UserDto>> list1 = userController.findAllUsers();
-        assertEquals(0, Objects.requireNonNull(list1.getBody()).size());
+    public void findAllUsers() {
+        when(userService.findAllUsers())
+                .thenReturn(List.of(userDto1));
+
+        ResponseEntity<List<UserDto>> res = userController.findAllUsers();
+        assertThat(res.getStatusCodeValue()).isEqualTo(200);
+        assertThat(Objects.requireNonNull(res.getBody()).size()).isEqualTo(1);
     }
 
     @Test
-    void getByWrongId() {
-        assertThrows(NoSuchElementException.class, () -> userController.findUserById(10L));
+    public void findUserById() {
+        when(userService.findUserById(anyLong()))
+                .thenReturn(userDto2);
+
+        ResponseEntity<UserDto>  res = userController.findUserById(1L);
+        assertThat(res.getStatusCodeValue()).isEqualTo(200);
+        assertThat(Objects.requireNonNull(res.getBody()).getName()).isEqualTo(userDto2.getName());
     }
 
     @Test
-    void updateByWrongId() {
-        assertThrows(NoSuchElementException.class, () -> userController.updateUser(10L, user));
+    public void deleteUser() {
+        ResponseEntity<?> res = userController.deleteUser(1L);
+        assertThat(res.getStatusCodeValue()).isEqualTo(200);
     }
+
 }
