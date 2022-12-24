@@ -136,7 +136,7 @@ class ItemControllerTest {
     void createCommentToWrongItem() {
         userController.create(userDto);
         assertThrows(ValidationException.class, () -> itemController.createComment(comment, 1L, 1L));
-        itemController.createItem(Optional.of(1L), itemDto );
+        itemController.createItem(Optional.of(1L), itemDto);
         assertThrows(ValidationException.class, () -> itemController.createComment(comment, 3L, 1L));
 
     }

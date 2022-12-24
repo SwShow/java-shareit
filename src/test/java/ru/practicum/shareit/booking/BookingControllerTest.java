@@ -61,7 +61,7 @@ class BookingControllerTest {
 
     @Test
     void getAllForBooker() {
-        when(bookingService.findAllForBooker(PageRequest.of(0/5, 5), 1L, "WAITING"))
+        when(bookingService.findAllForBooker(PageRequest.of(0 / 5, 5), 1L, "WAITING"))
                 .thenReturn(List.of(bookingDto2));
 
         ResponseEntity<List<BookingDto>> res = bookingController.getAllForBooker(1L, "WAITING", 0, 5);
@@ -71,7 +71,7 @@ class BookingControllerTest {
 
     @Test
     void getAllForOwner() {
-        when(bookingService.findAllForOwner(PageRequest.of(0/5, 5), 1L, "WAITING"))
+        when(bookingService.findAllForOwner(PageRequest.of(0 / 5, 5), 1L, "WAITING"))
                 .thenReturn(List.of(bookingDto2));
 
         ResponseEntity<List<BookingDto>> res = bookingController.getAllForOwner(1L, "WAITING", 0, 5);
