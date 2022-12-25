@@ -10,7 +10,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.CommentDtoLittle;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
