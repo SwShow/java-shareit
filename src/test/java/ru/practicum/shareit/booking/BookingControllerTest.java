@@ -18,7 +18,7 @@ import static ru.practicum.shareit.booking.BookingStatus.WAITING;
 
 @ExtendWith(MockitoExtension.class)
 class BookingControllerTest {
-    @InjectMocks
+  @InjectMocks
     BookingController bookingController;
     @Mock
     private BookingService bookingService;
