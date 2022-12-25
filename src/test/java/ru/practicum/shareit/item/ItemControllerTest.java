@@ -2,85 +2,70 @@ package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.shareit.booking.BookingController;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.CommentDtoLittle;
-import ru.practicum.shareit.item.comment.dto.CommentMapper;
-import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
-import static ru.practicum.shareit.booking.BookingStatus.WAITING;
 
 @ExtendWith(MockitoExtension.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemControllerTest {
-    @Autowired
+    @InjectMocks
     private ItemController itemController;
-    @Autowired
-    private UserController userController;
-    @Autowired
-    private BookingController bookingController;
-    @Autowired
-            private ItemMapper itemMapper;
-    @Autowired
-            private UserMapper userMapper;
-    @Autowired
-            private CommentMapper commentMapper;
+    @Mock
+    private ItemService itemService;
 
-    ItemDto itemDto = new ItemDto(0L, "item_name", "item_description", true, null,
+    ItemDto itemDto1 = new ItemDto(0L, "item_name", "item_description", true, null,
             null, new ArrayList<>(), 0L);
-
-    UserDto userDto = new UserDto(0L, "user_name", "username@email.com");
+    ItemDto itemDto2 = new ItemDto(1L, "item_name", "item_description", true, null,
+            null, new ArrayList<>(), 0L);
+    ItemDto itemDto3 = new ItemDto(1L, "update_name", "update_description", true, null,
+            null, new ArrayList<>(), 0L);
 
     CommentDtoLittle comment = new CommentDtoLittle("comment", 0L, 0L);
 
+    CommentDto commentDto = new CommentDto(1L, "comment", "author_name", LocalDateTime.now());
+
     @Test
     void createItem() {
-        UserDto userDto1 = userController.create(userDto).getBody();
-        System.out.println(userDto1);
-        ResponseEntity<ItemDto> itemDto1 = itemController.createItem(Optional.of(1L), itemDto);
+        when(itemService.createItem(itemDto1, Optional.of(1L)))
+                .thenReturn(itemDto2);
+        ResponseEntity<ItemDto> res = itemController.createItem(Optional.of(1L), itemDto1);
         assert itemDto1 != null;
-        assertEquals(OK, itemDto1.getStatusCode());
-        ResponseEntity<ItemDto> itemDto2 = itemController.getItemOfId(itemDto1.getBody().getId(), userDto1.getId());
-        assertEquals(OK, itemDto2.getStatusCode());
-        assertEquals(itemDto1.getBody().getId(), userDto1.getId());
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(Objects.requireNonNull(res.getBody()).getId(), itemDto2.getId());
     }
 
     @Test
     void updateItem() {
-        userController.create(userDto);
-        itemController.createItem(Optional.of(1L), itemDto);
-        ItemDto itemDto1 = new ItemDto(0L, "new name", "updateDescription", false,
-                null, null, new ArrayList<>(), 0L);
-        ResponseEntity<ItemDto> itemDto2 = itemController.updateItem(Optional.of(1L), 1L, itemDto1);
-        assertEquals(OK, itemDto2.getStatusCode());
-        ItemDto itemDto3 = itemController.getItemOfId(1L, 1L).getBody();
-        assert itemDto3 != null;
-        assertEquals("new name", itemDto3.getName());
-        assertEquals("updateDescription", itemDto3.getDescription());
+        when(itemService.updateItem(Optional.of(1L), 1L, itemDto3))
+                .thenReturn(itemDto3);
+        ResponseEntity<ItemDto> res = itemController.updateItem(Optional.of(1L), 1L, itemDto3);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals("update_name", Objects.requireNonNull(res.getBody()).getName());
+        assertEquals("update_description", res.getBody().getDescription());
     }
 
     @Test
     void getItems() {
-        userController.create(userDto);
-        itemController.createItem(Optional.of(1L), itemDto);
+        when(itemService.getItems(Optional.of(1L)))
+                .thenReturn(List.of(itemDto2));
+
         ResponseEntity<List<ItemDto>> list = itemController.getItems(Optional.of(1L));
         assertEquals(OK, list.getStatusCode());
         assertEquals(1, Objects.requireNonNull(list.getBody()).size());
@@ -88,62 +73,22 @@ class ItemControllerTest {
 
     @Test
     void getItemOfText() {
-        userController.create(userDto);
-        itemController.createItem(Optional.of(1L), itemDto);
-        ResponseEntity<List<ItemDto>> list = itemController.getItemOfText(Optional.of(1L), "Item");
+        when(itemService.getItemOfText(Optional.of(1L), "uPd"))
+                .thenReturn(List.of(itemDto3));
+
+        ResponseEntity<List<ItemDto>> list = itemController.getItemOfText(Optional.of(1L), "uPd");
         assertEquals(OK, list.getStatusCode());
         assertEquals(1, Objects.requireNonNull(list.getBody()).size());
     }
 
     @Test
     void createComment() {
-        Comment newComment = new Comment(0L, "Какой-то коммент", itemMapper.toItem(itemDto),
-                userMapper.toUser(userDto), LocalDateTime.now());
-        CommentDto newCommentDto = commentMapper.toCommentDto(newComment);
-        newCommentDto.setAuthorName(userMapper.toUser(userDto).getName());
-        UserDto user = userController.create(userDto).getBody();
-        ItemDto item = itemController.createItem(Optional.of(1L), itemDto).getBody();
-        ItemDto.BookingForItemDto booking = new ItemDto.BookingForItemDto(0L,
-                LocalDateTime.of(2022, 12, 30, 12, 30),
-                LocalDateTime.of(2023, 11, 10, 13, 0), user.getId());
-        booking.setId(1L);
-        UserDto user2 = userController.create(new UserDto(0L, "name", "email2@email.com")).getBody();
-        bookingController.save(new BookingDto(0L, 1L,
-                LocalDateTime.of(2022, 12, 30, 12, 30),
-                LocalDateTime.of(2023, 11, 10, 13, 0),
-                itemDto,user2, WAITING), user2.getId());
-        bookingController.approve(1L, true, 1L);
-        Comment comment1 = commentMapper.toComment(comment);
-        comment1.setItem(itemMapper.toItem(itemDto));
-        comment1.setAuthor(userMapper.toUser(userDto));
-        comment1.setCreated(LocalDateTime.now());
-
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, item.getId(), user2.getId()));
-    }
-
-    @Test
-    void emptyComment() {
-        comment.setText(" ");
-        assertThrows(ConstraintViolationException.class, () -> itemController.createComment(comment, 1L, 1L));
-    }
-
-    @Test
-    void createCommentByWrongUser() {
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, 1L, 1L));
-    }
-
-    @Test
-    void createCommentToWrongItem() {
-        userController.create(userDto);
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, 1L, 1L));
-        itemController.createItem(Optional.of(1L), itemDto);
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, 3L, 1L));
-
-    }
-
-    @Test
-    void getAllWithWrongFrom() {
-        assertThrows(NoSuchElementException.class, () -> itemController.getItems(Optional.of(1L)));
+        when(itemService.createComment(comment, 1L, 1L))
+                .thenReturn(commentDto);
+        ResponseEntity<CommentDto> res = itemController.createComment(comment, 1L, 1L);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1L, Objects.requireNonNull(res.getBody()).getId());
+        assertEquals("author_name", res.getBody().getAuthorName());
     }
 
 }
