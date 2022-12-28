@@ -46,4 +46,13 @@ public class Item {
     @Transient
     private List<CommentDto> comments;
 
+    public Item(long id, String name, String description, boolean available, User owner, ItemRequest request) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+        this.owner = owner;
+        this.request = request;
+
+    }
 }

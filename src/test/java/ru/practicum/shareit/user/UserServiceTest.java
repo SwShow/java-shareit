@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -35,7 +36,7 @@ class UserServiceTest {
     }
 
     @Test
-    void addNewUser() {
+    public void addNewUser() {
         UserDto dto = new UserDto();
         dto.setName("test");
         dto.setEmail("test@mail.ru");
@@ -53,10 +54,28 @@ class UserServiceTest {
     }
 
     @Test
+    public void updateUser() {
+        UserDto userDto = new UserDto(1L, "test", "test@mail.ru");
+        User updateUser = new User(1L,"update_test", "update_test@mail.ru");
+        user.setId(1L);
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        when(userRepository.save(ArgumentMatchers.any(User.class)))
+                .thenReturn(updateUser);
+
+        UserDto dto = userService.updateUser(userDto, 1L);
+        assertEquals(dto.getName(), updateUser.getName());
+        assertEquals(dto.getEmail(), updateUser.getEmail());
+        assertEquals(dto.getId(), updateUser.getId());
+    }
+
+    @Test
     public void getUser_shouldReturnUser() {
         user.setId(1L);
         when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.ofNullable(user));
+
         UserDto foundUser = userService.findUserById(user.getId());
 
         assertEquals(foundUser.getId(), user.getId());
@@ -86,17 +105,6 @@ class UserServiceTest {
         assertEquals(user.getEmail(), users.get(0).getEmail());
         Mockito.verify(userRepository, Mockito.times(1))
                 .findAll();
-    }
-
-
-    @Test
-    public void deleteUser_shouldVerifyInvocation() {
-        when(userRepository.findById(user.getId()))
-                .thenReturn(Optional.ofNullable(user));
-
-        userService.deleteUser(user.getId());
-        Mockito.verify(userRepository, Mockito.times(1))
-                .deleteById(user.getId());
     }
 
 }

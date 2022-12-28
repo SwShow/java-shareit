@@ -45,8 +45,9 @@ public class ItemServiceImpl implements ItemService {
         log.info("requestId:" + requestId);
         ItemRequest request = null;
 
-        if (requestId.isPresent()) {
-            request = itemRequestRepository.findById(requestId.get()).get();
+        if (requestId.isPresent() && requestId.get() > 0L) {
+            request = itemRequestRepository.findById(requestId.get())
+                    .orElseThrow(() -> new NoSuchElementException("запрос c идентификатором " + requestId + " не существует"));
         }
 
         log.info("request:" + request);

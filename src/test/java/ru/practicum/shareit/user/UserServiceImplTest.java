@@ -18,7 +18,7 @@ import javax.persistence.TypedQuery;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserServiceImplTest {
     private final UserService userService;
-    private final EntityManager em;
+    private final EntityManager manager;
 
     @Test
     public void addUser_shouldAddNewUser() {
@@ -27,7 +27,7 @@ class UserServiceImplTest {
         newUser.setName("test");
 
         userService.createUser(newUser);
-        TypedQuery<User> query = em.createQuery("Select u from User u where u.email = :email", User.class);
+        TypedQuery<User> query = manager.createQuery("Select u from User u where u.email = :email", User.class);
         User user = query.setParameter("email", newUser.getEmail()).getSingleResult();
 
         Assertions.assertEquals(newUser.getName(), user.getName());
