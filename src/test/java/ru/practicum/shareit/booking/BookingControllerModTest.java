@@ -58,8 +58,8 @@ class BookingControllerModTest {
     @Test
     void shouldCreateTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("aname");
+        userDto.setEmail("auser@email.com");
         UserDto user = userController.create(userDto).getBody();
         itemController.createItem(Optional.of(user.getId()), itemDto);
         userDto1 = new UserDto();
@@ -78,8 +78,8 @@ class BookingControllerModTest {
     @Test
     void createForWrongItemTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("bname");
+        userDto.setEmail("buser@email.com");
         userController.create(userDto);
         assertThrows(NoSuchElementException.class, () -> bookingController.save(bookingDto, 1L));
     }
@@ -87,8 +87,8 @@ class BookingControllerModTest {
     @Test
     void createByOwnerTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("cname");
+        userDto.setEmail("cuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         assert user != null;
         long id = user.getId();
@@ -100,8 +100,8 @@ class BookingControllerModTest {
     @Test
     void createToUnavailableItemTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("dname");
+        userDto.setEmail("duser@email.com");
         UserDto user = userController.create(userDto).getBody();
         itemDto.setAvailable(false);
         itemController.createItem(Optional.of(user.getId()), itemDto);
@@ -115,13 +115,13 @@ class BookingControllerModTest {
     @Test
     void createWithWrongEndDate() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("ename");
+        userDto.setEmail("euser@email.com");
         UserDto user = userController.create(userDto).getBody();
         itemController.createItem(Optional.of(user.getId()), itemDto);
         userDto1 = new UserDto();
-        userDto1.setName("name");
-        userDto1.setEmail("user1@email.com");
+        userDto1.setName("gname");
+        userDto1.setEmail("guser1@email.com");
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto.setEnd(LocalDateTime.of(2022, 9, 24, 12, 30));
         assertThrows(ValidationException.class, () -> bookingController.save(bookingDto, user1.getId()));
@@ -130,13 +130,13 @@ class BookingControllerModTest {
     @Test
     void approveTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("fname");
+        userDto.setEmail("fuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         itemController.createItem(Optional.of(user.getId()), itemDto);
         userDto1 = new UserDto();
-        userDto1.setName("name");
-        userDto1.setEmail("user1@email.com");
+        userDto1.setName("hname");
+        userDto1.setEmail("huser1@email.com");
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto = new BookingDto(0L, 1L,
                 LocalDateTime.of(2022, 12, 30, 12, 30),
@@ -156,15 +156,15 @@ class BookingControllerModTest {
     @Test
     void approveWrongUserTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("iname");
+        userDto.setEmail("iuser@email.com");
         ResponseEntity<UserDto>  res = userController.create(userDto);
         UserDto user = res.getBody();
         assertThat(res.getStatusCodeValue()).isEqualTo(200);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         userDto1 = new UserDto();
-        userDto1.setName("name");
-        userDto1.setEmail("user1@email.com");
+        userDto1.setName("jname");
+        userDto1.setEmail("juser1@email.com");
         UserDto user1 = userController.create(userDto1).getBody();
         bookingController.save(bookingDto, user1.getId());
         assertThrows(NoSuchElementException.class, () -> bookingController.approve(1L, true, 2L));
@@ -173,13 +173,13 @@ class BookingControllerModTest {
     @Test
     void approveBookingWithWrongStatus() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("kname");
+        userDto.setEmail("kuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         itemController.createItem(Optional.of(user.getId()), itemDto);
         userDto1 = new UserDto();
-        userDto1.setName("name");
-        userDto1.setEmail("user1@email.com");
+        userDto1.setName("lname");
+        userDto1.setEmail("luser1@email.com");
         UserDto user1 = userController.create(userDto1).getBody();
         bookingController.save(bookingDto, user1.getId());
         bookingController.approve(1L, true, 1L);
@@ -189,14 +189,14 @@ class BookingControllerModTest {
     @Test
     void getAllUserTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("mname");
+        userDto.setEmail("muser@email.com");
         UserDto user = userController.create(userDto).getBody();
         assert user != null;
         itemController.createItem(Optional.of(user.getId()), itemDto);
         userDto1 = new UserDto();
-        userDto1.setName("name");
-        userDto1.setEmail("user1@email.com");
+        userDto1.setName("oname");
+        userDto1.setEmail("ouser1@email.com");
         UserDto user1 = userController.create(userDto1).getBody();
         BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
         assertEquals(1, bookingController.getAllForBooker(user1.getId(), "WAITING",
@@ -242,15 +242,15 @@ class BookingControllerModTest {
     @Test
     void getWrongUser() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("pname");
+        userDto.setEmail("puser@email.com");
         UserDto user = userController.create(userDto).getBody();
         System.out.println(user);
         assert user != null;
         itemController.createItem(Optional.of(user.getId()), itemDto);
         userDto1 = new UserDto();
-        userDto1.setName("name");
-        userDto1.setEmail("user1@email.com");
+        userDto1.setName("qname");
+        userDto1.setEmail("quser1@email.com");
         UserDto user1 = userController.create(userDto1).getBody();
         assert user1 != null;
         bookingController.save(bookingDto, user1.getId());
@@ -260,8 +260,8 @@ class BookingControllerModTest {
     @Test
     void findBookingsForUserWithoutItems() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("rname");
+        userDto.setEmail("ruser@email.com");
         UserDto user = userController.create(userDto).getBody();
         assertThrows(ValidationException.class, () -> bookingController.getAllForOwner(user.getId(),  "ALL",
                 0, 20));
@@ -270,8 +270,8 @@ class BookingControllerModTest {
     @Test
     void  findBookingsWithUnsupportedStatus() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("sname");
+        userDto.setEmail("suser@email.com");
         UserDto user = userController.create(userDto).getBody();
         assertThrows(ValidationException.class, () -> bookingController.getAllForOwner(user.getId(), "HI",
                 0, 20));

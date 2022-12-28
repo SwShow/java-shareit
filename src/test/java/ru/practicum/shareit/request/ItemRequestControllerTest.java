@@ -28,12 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ItemRequestControllerTest {
     @Autowired
     private ItemRequestController requestController;
-
     @Autowired
     private UserController userController;
-
     private ItemRequestDto itemRequestDto;
-
     private UserDto userDto;
     @Autowired
     private ItemRequestMapper mapper;
