@@ -44,7 +44,9 @@ class ItemRequestControllerTest {
     void beforeEach() {
         itemRequestDto = new ItemRequestDto(0L, "item request description", null, new ArrayList<>());
 
-        userDto = new UserDto(0L, "name", "user@email.com");
+        userDto = new UserDto();
+        userDto.setName("name");
+        userDto.setEmail("user@email.com");
     }
 
     @Test

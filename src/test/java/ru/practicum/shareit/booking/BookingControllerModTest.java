@@ -49,9 +49,13 @@ class BookingControllerModTest {
         itemDto = new ItemDto(0L, "name", "description", true, null, null,
                 new ArrayList<>(), 0L);
 
-        userDto = new UserDto(0L, "name", "user@email.com");
+        userDto = new UserDto();
+        userDto.setName("name");
+        userDto.setEmail("user@email.com");
 
-        userDto1 = new UserDto(0L, "name", "user1@email.com");
+        userDto1 = new UserDto();
+        userDto1.setName("name");
+        userDto1.setEmail("user1@email.com");
 
         bookingDto = new BookingDto(0L, 1L,
                 LocalDateTime.of(2022, 12, 30, 12, 30),
