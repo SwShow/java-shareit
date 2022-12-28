@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,24 +29,19 @@ class ItemRequestControllerTest {
     private ItemRequestController requestController;
     @Autowired
     private UserController userController;
-    private ItemRequestDto itemRequestDto;
+    private final ItemRequestDto itemRequestDto = new ItemRequestDto(
+            0L, "item request description", null, new ArrayList<>());
     private UserDto userDto;
     @Autowired
     private ItemRequestMapper mapper;
     @Autowired
     private UserMapper userMapper;
 
-    @BeforeEach
-    void beforeEach() {
-        itemRequestDto = new ItemRequestDto(0L, "item request description", null, new ArrayList<>());
-
-    }
-
     @Test
     void createTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("rname");
+        userDto.setEmail("ruser@email.com");
         UserDto user = userController.create(userDto).getBody();
         ItemRequestDto itemRequest = requestController.addItemRequest(user.getId(), itemRequestDto).getBody();
         assert itemRequest != null;
@@ -61,8 +55,8 @@ class ItemRequestControllerTest {
     @Test
     void findWithItemTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("tname");
+        userDto.setEmail("tuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         UserDto user2 = userController.create(new UserDto(0L, "name", "user2@email.com")).getBody();
         ItemRequestDto itemRequest = requestController.addItemRequest(user.getId(), itemRequestDto).getBody();
@@ -79,8 +73,8 @@ class ItemRequestControllerTest {
     @Test
     void findWithBadPagination() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("uname");
+        userDto.setEmail("uuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         UserDto user2 = userController.create(new UserDto(0L, "name", "user2@email.com")).getBody();
         ItemRequestDto itemRequest = requestController.addItemRequest(user.getId(), itemRequestDto).getBody();
@@ -99,8 +93,8 @@ class ItemRequestControllerTest {
     @Test
     void getAllByOwnerTest() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("vname");
+        userDto.setEmail("vuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         requestController.addItemRequest(user.getId(), itemRequestDto).getBody();
         assertEquals(1, requestController.getItemRequestsOwnerSorted(user.getId(),
@@ -116,8 +110,8 @@ class ItemRequestControllerTest {
     @Test
     void getAll() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("wname");
+        userDto.setEmail("wuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         requestController.addItemRequest(user.getId(), itemRequestDto);
         assertEquals(0, requestController.getItemRequestsOtherSorted(user.getId(),
@@ -137,8 +131,8 @@ class ItemRequestControllerTest {
     @Test
     void getAllWithWrongFrom() {
         userDto = new UserDto();
-        userDto.setName("name");
-        userDto.setEmail("user@email.com");
+        userDto.setName("xname");
+        userDto.setEmail("xuser@email.com");
         userController.create(userDto);
         assertThrows(BadRequestException.class, () -> requestController.getItemRequestsOtherSorted(
                 1L, -1, 10));

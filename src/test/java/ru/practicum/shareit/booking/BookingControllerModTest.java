@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,20 +39,13 @@ class BookingControllerModTest {
 
     private UserDto userDto1;
 
-    private ItemDto itemDto;
+    private final ItemDto itemDto = new ItemDto(0L, "name", "description", true, null, null,
+            new ArrayList<>(), 0L);
 
-    private BookingDto bookingDto;
-
-    @BeforeEach
-    void beforeEach() {
-         itemDto = new ItemDto(0L, "name", "description", true, null, null,
-                new ArrayList<>(), 0L);
-
-          bookingDto = new BookingDto(0L, 1L,
-                LocalDateTime.of(2022, 12, 30, 12, 30),
-                LocalDateTime.of(2023, 11, 10, 13, 0),
-                itemDto, userDto, WAITING);
-    }
+    private BookingDto bookingDto = new BookingDto(0L, 1L,
+            LocalDateTime.of(2022, 12, 30, 12, 30),
+            LocalDateTime.of(2023, 11, 10, 13, 0),
+            itemDto, userDto, WAITING);
 
     @Test
     void shouldCreateTest() {
@@ -260,8 +252,8 @@ class BookingControllerModTest {
     @Test
     void findBookingsForUserWithoutItems() {
         userDto = new UserDto();
-        userDto.setName("rname");
-        userDto.setEmail("ruser@email.com");
+        userDto.setName("zname");
+        userDto.setEmail("zuser@email.com");
         UserDto user = userController.create(userDto).getBody();
         assertThrows(ValidationException.class, () -> bookingController.getAllForOwner(user.getId(),  "ALL",
                 0, 20));
