@@ -152,9 +152,9 @@ class BookingControllerModTest {
         ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto.setItemId(item.getId());
-        bookingController.save(bookingDto, user1.getId());
-        bookingController.approve(1L, true, user.getId());
-        assertThrows(NoSuchElementException.class, () -> bookingController.approve(1L, true, 1L));
+        BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
+        bookingController.approve(booking.getId(), true, user.getId());
+        assertThrows(ValidationException.class, () -> bookingController.approve(booking.getId(), true, user.getId()));
 
     }
 

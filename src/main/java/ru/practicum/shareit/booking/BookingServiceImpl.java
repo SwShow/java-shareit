@@ -58,7 +58,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto approve(long userId, long bookingId, boolean status) {
-        getUser(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("пользователь не найден"));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("указанное бронирование не существует"));
         if (booking.getItem().getOwner().getId() != userId) {
@@ -73,7 +74,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getById(long bookingId, long userId) {
-        getUser(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("пользователь не найден"));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("указанное бронирование не существует"));
         long id = booking.getItem().getId();
