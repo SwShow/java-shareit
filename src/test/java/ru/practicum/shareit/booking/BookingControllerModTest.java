@@ -11,6 +11,7 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -67,11 +68,11 @@ class BookingControllerModTest {
     @Test
     void shouldCreateTest() {
         UserDto user = userController.create(userDto).getBody();
-        itemController.createItem(Optional.of(user.getId()), itemDto);
+        ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
         UserDto user1 = userController.create(userDto1).getBody();
+        bookingDto.setItemId(item.getId());
         BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
         assertEquals(1L, bookingController.getById(booking.getId(), user1.getId()).getBody().getId());
-
     }
 
     @Test
@@ -103,8 +104,7 @@ class BookingControllerModTest {
         itemDto.setAvailable(false);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
-        assertThrows(ValidationException.class, () -> bookingController.save(bookingDto, 2L));
-
+        assertThrows(NoSuchElementException.class, () -> bookingController.save(bookingDto, 2L));
     }
 
     @Test
@@ -113,19 +113,15 @@ class BookingControllerModTest {
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto.setEnd(LocalDateTime.of(2022, 9, 24, 12, 30));
-        assertThrows(ValidationException.class, () -> bookingController.save(bookingDto, user1.getId()));
-
+        assertThrows(NoSuchElementException.class, () -> bookingController.save(bookingDto, user1.getId()));
     }
 
     @Test
     void approveTest() {
         UserDto user = userController.create(userDto).getBody();
-        itemController.createItem(Optional.of(user.getId()), itemDto);
+        ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
         UserDto user1 = userController.create(userDto1).getBody();
-        bookingDto = new BookingDto(0L, 1L,
-                LocalDateTime.of(2022, 12, 30, 12, 30),
-                LocalDateTime.of(2023, 11, 10, 13, 0),
-                itemDto, userDto1, WAITING);
+        bookingDto.setItemId(item.getId());
         BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
         assertEquals(WAITING, bookingController.getById(booking.getId(), user1.getId()).getBody().getStatus());
         bookingController.approve(booking.getId(), true, user.getId());
@@ -143,8 +139,9 @@ class BookingControllerModTest {
         ResponseEntity<UserDto> res = userController.create(userDto);
         UserDto user = res.getBody();
         assertThat(res.getStatusCodeValue()).isEqualTo(200);
-        itemController.createItem(Optional.of(user.getId()), itemDto);
+        ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
         UserDto user1 = userController.create(userDto1).getBody();
+        bookingDto.setItemId(item.getId());
         bookingController.save(bookingDto, user1.getId());
         assertThrows(NoSuchElementException.class, () -> bookingController.approve(1L, true, 2L));
 
@@ -153,8 +150,9 @@ class BookingControllerModTest {
     @Test
     void approveBookingWithWrongStatus() {
         UserDto user = userController.create(userDto).getBody();
-        itemController.createItem(Optional.of(user.getId()), itemDto);
+        ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
         UserDto user1 = userController.create(userDto1).getBody();
+        bookingDto.setItemId(item.getId());
         bookingController.save(bookingDto, user1.getId());
         bookingController.approve(1L, true, 1L);
         assertThrows(ValidationException.class, () -> bookingController.approve(1L, true, 1L));
@@ -165,8 +163,9 @@ class BookingControllerModTest {
     void getAllUserTest() {
         UserDto user = userController.create(userDto).getBody();
         assert user != null;
-        itemController.createItem(Optional.of(user.getId()), itemDto);
+        ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
         UserDto user1 = userController.create(userDto1).getBody();
+        bookingDto.setItemId(item.getId());
         BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
         assertEquals(1, bookingController.getAllForBooker(user1.getId(), "WAITING",
                 0, 10).getBody().size());
@@ -214,9 +213,10 @@ class BookingControllerModTest {
         UserDto user = userController.create(userDto).getBody();
         System.out.println(user);
         assert user != null;
-        itemController.createItem(Optional.of(user.getId()), itemDto);
+        ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
         UserDto user1 = userController.create(userDto1).getBody();
         assert user1 != null;
+        bookingDto.setItemId(item.getId());
         bookingController.save(bookingDto, user1.getId());
         assertThrows(NoSuchElementException.class, () -> bookingController.getById(1L, 10L));
     }

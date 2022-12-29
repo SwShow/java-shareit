@@ -68,7 +68,7 @@ class ItemRequestControllerTest {
         ItemRequest request = mapper.toItemRequest(itemRequest);
         User user1 = request.getRequester();
 
-        assertEquals(1L, requestController.getItemRequestOfId(user.getId(), itemRequest.getId()).getBody().getId());
+        assertEquals(5L, requestController.getItemRequestOfId(user.getId(), itemRequest.getId()).getBody().getId());
     }
 
     @Test
@@ -79,8 +79,8 @@ class ItemRequestControllerTest {
         Item item = new Item(0L, "item", "desc", true, userMapper.toUser(user2),
                 mapper.toItemRequest(itemRequest));
 
-        assertEquals(0, requestController.getItemRequestsOtherSorted(1L, 0, 20).getBody().size());
-        assertEquals(0, requestController.getItemRequestsOwnerSorted(1L, 0,  20).getBody().size());
+        assertEquals(0, requestController.getItemRequestsOtherSorted(user.getId(), 0, 20).getBody().size());
+        assertEquals(0, requestController.getItemRequestsOwnerSorted(user2.getId(), 0,  20).getBody().size());
     }
 
     @Test
