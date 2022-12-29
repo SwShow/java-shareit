@@ -11,7 +11,6 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
