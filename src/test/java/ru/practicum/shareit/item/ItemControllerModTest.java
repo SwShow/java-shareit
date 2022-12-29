@@ -22,6 +22,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequestController;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.UserController;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -50,9 +51,12 @@ class ItemControllerModTest {
     @Autowired
     private BookingController bookingController;
     @Autowired
-    private CommentRepository commentRepository;
+    private UserRepository userRepository;
+
     @Autowired
-    private ItemService itemService;
+    private ItemRepository itemRepository;
+    @Autowired
+    private CommentRepository commentRepository;
     private ItemDto itemDto;
     private UserDto userDto;
     private ItemRequestDto requestDto;
@@ -66,6 +70,10 @@ class ItemControllerModTest {
 
     @BeforeEach
     void beforeEach() {
+            commentRepository.deleteAll();
+            itemRepository.deleteAll();
+            userRepository.deleteAll();
+
         itemDto = new ItemDto(0L, "name", "description", true, null,
                 null, new ArrayList<>(), 0L);
 
@@ -212,7 +220,6 @@ class ItemControllerModTest {
         assertThrows(ValidationException.class, () -> itemController.createComment(comment, 1L, 1L));
         itemController.createItem(Optional.of(1L), itemDto);
         assertThrows(ValidationException.class, () -> itemController.createComment(comment, 3L, 1L));
-
     }
 
     @Test
