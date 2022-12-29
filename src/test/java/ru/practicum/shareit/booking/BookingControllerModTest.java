@@ -67,8 +67,6 @@ class BookingControllerModTest {
     @Test
     void shouldCreateTest() {
         UserDto user = userController.create(userDto).getBody();
-        ItemDto itemDto = new ItemDto(0L, "name", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
@@ -94,8 +92,6 @@ class BookingControllerModTest {
         assert user != null;
         long id = user.getId();
         System.out.println("id" + id);
-        ItemDto itemDto = new ItemDto(0L, "aname", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(id), itemDto);
         assertThrows(NoSuchElementException.class, () -> bookingController.save(bookingDto, 1L));
 
@@ -104,8 +100,6 @@ class BookingControllerModTest {
     @Test
     void createToUnavailableItemTest() {
         UserDto user = userController.create(userDto).getBody();
-        ItemDto itemDto = new ItemDto(0L, "bname", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemDto.setAvailable(false);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
@@ -116,8 +110,6 @@ class BookingControllerModTest {
     @Test
     void createWithWrongEndDate() {
         UserDto user = userController.create(userDto).getBody();
-        ItemDto itemDto = new ItemDto(0L, "cname", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto.setEnd(LocalDateTime.of(2022, 9, 24, 12, 30));
@@ -128,8 +120,6 @@ class BookingControllerModTest {
     @Test
     void approveTest() {
         UserDto user = userController.create(userDto).getBody();
-        ItemDto itemDto = new ItemDto(0L, "dname", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto = new BookingDto(0L, 1L,
@@ -153,8 +143,6 @@ class BookingControllerModTest {
         ResponseEntity<UserDto> res = userController.create(userDto);
         UserDto user = res.getBody();
         assertThat(res.getStatusCodeValue()).isEqualTo(200);
-        ItemDto itemDto = new ItemDto(0L, "ename", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         bookingController.save(bookingDto, user1.getId());
@@ -165,8 +153,6 @@ class BookingControllerModTest {
     @Test
     void approveBookingWithWrongStatus() {
         UserDto user = userController.create(userDto).getBody();
-        ItemDto itemDto = new ItemDto(0L, "fname", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         bookingController.save(bookingDto, user1.getId());
@@ -179,8 +165,6 @@ class BookingControllerModTest {
     void getAllUserTest() {
         UserDto user = userController.create(userDto).getBody();
         assert user != null;
-        ItemDto itemDto = new ItemDto(0L, "gname", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
@@ -230,8 +214,6 @@ class BookingControllerModTest {
         UserDto user = userController.create(userDto).getBody();
         System.out.println(user);
         assert user != null;
-        ItemDto itemDto = new ItemDto(0L, "iname", "description", true, null, null,
-                new ArrayList<>(), 0L);
         itemController.createItem(Optional.of(user.getId()), itemDto);
         UserDto user1 = userController.create(userDto1).getBody();
         assert user1 != null;
