@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS requests
     requester_id BIGINT,
     created      TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     CONSTRAINT pk_request_id PRIMARY KEY (id),
-    CONSTRAINT fk_requester_id FOREIGN KEY (requester_id) REFERENCES users (id)
+    CONSTRAINT fk_requester_id FOREIGN KEY (requester_id) REFERENCES users (id) ON
+    DELETE CASCADE ON UPDATE CASCADE
     );
 CREATE TABLE IF NOT EXISTS items
 (
@@ -24,8 +25,10 @@ CREATE TABLE IF NOT EXISTS items
     owner_id    BIGINT                                  NOT NULL,
     request_id BIGINT,
     CONSTRAINT pk_item_id PRIMARY KEY (id),
-    CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES users (id),
-    CONSTRAINT fk_request_id FOREIGN KEY (request_id) REFERENCES requests (id),
+    CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES users (id) ON
+    DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_request_id FOREIGN KEY (request_id) REFERENCES requests (id) ON
+    DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT uq_name UNIQUE (name)
 );
 
@@ -38,8 +41,10 @@ CREATE TABLE IF NOT EXISTS bookings
     booker_id  BIGINT,
     status     VARCHAR(10)                             NOT NULL,
     CONSTRAINT pk_booking_id PRIMARY KEY (id),
-    CONSTRAINT fk_item_id_booking FOREIGN KEY (item_id) REFERENCES items (id),
-    CONSTRAINT fk_booker_id FOREIGN KEY (booker_id) REFERENCES users (id)
+    CONSTRAINT fk_item_id_booking FOREIGN KEY (item_id) REFERENCES items (id) ON
+    DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_booker_id FOREIGN KEY (booker_id) REFERENCES users (id) ON
+    DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -52,6 +57,8 @@ CREATE TABLE IF NOT EXISTS comments
     author_id BIGINT,
     created   TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     CONSTRAINT pk_comment_id PRIMARY KEY (id),
-    CONSTRAINT fk_item_id_comment FOREIGN KEY (item_id) REFERENCES items (id),
-    CONSTRAINT fk_author_id FOREIGN KEY (author_id) REFERENCES users (id)
+    CONSTRAINT fk_item_id_comment FOREIGN KEY (item_id) REFERENCES items (id) ON
+    DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_author_id FOREIGN KEY (author_id) REFERENCES users (id) ON
+    DELETE CASCADE ON UPDATE CASCADE
 );

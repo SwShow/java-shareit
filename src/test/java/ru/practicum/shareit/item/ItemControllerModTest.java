@@ -52,27 +52,26 @@ class ItemControllerModTest {
     private BookingController bookingController;
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
     private CommentRepository commentRepository;
-    private ItemDto itemDto;
-    private UserDto userDto;
-    private ItemRequestDto requestDto;
-    private CommentDtoLittle comment;
     @Autowired
     private ItemMapper itemMapper;
     @Autowired
     private UserMapper userMapper;
     @Autowired
     private CommentMapper commentMapper;
+    private ItemDto itemDto;
+    private UserDto userDto;
+    private ItemRequestDto requestDto;
+    private CommentDtoLittle comment;
 
     @BeforeEach
     void beforeEach() {
-            commentRepository.deleteAll();
-            itemRepository.deleteAll();
-            userRepository.deleteAll();
+        commentRepository.deleteAll();
+        itemRepository.deleteAll();
+        userRepository.deleteAll();
 
         itemDto = new ItemDto(0L, "name", "description", true, null,
                 null, new ArrayList<>(), 0L);
@@ -188,7 +187,7 @@ class ItemControllerModTest {
         bookingController.save(new BookingDto(0L, 1L,
                 LocalDateTime.of(2022, 12, 30, 12, 30),
                 LocalDateTime.of(2023, 11, 10, 13, 0),
-                itemDto, user2, WAITING),  user2.getId()).getBody();
+                itemDto, user2, WAITING), user2.getId()).getBody();
         bookingController.approve(1L, true, 1L);
         Comment comment1 = commentMapper.toComment(comment);
         comment1.setItem(itemMapper.toItem(itemDto));
