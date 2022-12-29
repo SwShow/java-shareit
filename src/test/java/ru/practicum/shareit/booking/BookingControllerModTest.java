@@ -71,7 +71,7 @@ class BookingControllerModTest {
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto.setItemId(item.getId());
         BookingDto booking = bookingController.save(bookingDto, user1.getId()).getBody();
-        assertEquals(1L, bookingController.getById(booking.getId(), user1.getId()).getBody().getId());
+        assertEquals(booking.getId(), bookingController.getById(booking.getId(), user1.getId()).getBody().getId());
     }
 
     @Test
@@ -153,8 +153,8 @@ class BookingControllerModTest {
         UserDto user1 = userController.create(userDto1).getBody();
         bookingDto.setItemId(item.getId());
         bookingController.save(bookingDto, user1.getId());
-        bookingController.approve(1L, true, 1L);
-        assertThrows(ValidationException.class, () -> bookingController.approve(1L, true, 1L));
+        bookingController.approve(1L, true, user.getId());
+        assertThrows(NoSuchElementException.class, () -> bookingController.approve(1L, true, 1L));
 
     }
 
