@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") @Min(1) Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") @Min(1) Long id) {
         log.info("поступил запрос на получение данных пользователя");
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.OK);

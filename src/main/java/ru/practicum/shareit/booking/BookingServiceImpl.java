@@ -15,7 +15,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -91,23 +90,29 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllForBooker(PageRequest pageRequest, long bookerId, String state) {
+    public List<BookingDto> findAllForBooker(int from, int size, long bookerId, String state) {
+        if (from < 0) {
+            throw new BadRequestException("параметры пагинации не могут быть отрицательными");
+        }
         getUser(bookerId);
 
-        return findBookingsForBooking(state, bookerId, pageRequest)
+        return findBookingsForBooking(state, bookerId, PageRequest.of(from / size, size))
                 .stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDto> findAllForOwner(PageRequest pageRequest, long ownerId, String state) {
+    public List<BookingDto> findAllForOwner(int from, int size, long ownerId, String state) {
+        if (from < 0) {
+            throw new BadRequestException("параметры пагинации не могут быть отрицательными");
+        }
         getUser(ownerId);
         if (itemRepository.findAllByOwnerId(ownerId).isEmpty()) {
             throw new ValidationException("у вас нет вещей");
         }
 
-        return findBookingsForOwner(state, ownerId, pageRequest)
+        return findBookingsForOwner(state, ownerId, PageRequest.of(from / size, size))
                 .stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());

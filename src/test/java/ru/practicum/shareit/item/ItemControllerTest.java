@@ -26,23 +26,22 @@ class ItemControllerTest {
     @Mock
     private ItemService itemService;
 
-    ItemDto itemDto1 = new ItemDto(0L, "item_name", "item_description", true, null,
+    private final ItemDto itemDto1 = new ItemDto(0L, "item_name", "item_description", true, null,
             null, new ArrayList<>(), 0L);
-    ItemDto itemDto2 = new ItemDto(1L, "item_name", "item_description", true, null,
+    private final ItemDto itemDto2 = new ItemDto(1L, "item_name", "item_description", true, null,
             null, new ArrayList<>(), 0L);
-    ItemDto itemDto3 = new ItemDto(1L, "update_name", "update_description", true, null,
+    private final ItemDto itemDto3 = new ItemDto(1L, "update_name", "update_description", true, null,
             null, new ArrayList<>(), 0L);
 
-    CommentDtoLittle comment = new CommentDtoLittle("comment", 0L, 0L);
+    private final CommentDtoLittle comment = new CommentDtoLittle("comment", 0L, 0L);
 
-    CommentDto commentDto = new CommentDto(1L, "comment", "author_name", LocalDateTime.now());
+    private final CommentDto commentDto = new CommentDto(1L, "comment", "author_name", LocalDateTime.now());
 
     @Test
     void createItem() {
         when(itemService.createItem(itemDto1, Optional.of(1L)))
                 .thenReturn(itemDto2);
         ResponseEntity<ItemDto> res = itemController.createItem(Optional.of(1L), itemDto1);
-        assert itemDto1 != null;
         assertEquals(OK, res.getStatusCode());
         assertEquals(Objects.requireNonNull(res.getBody()).getId(), itemDto2.getId());
     }

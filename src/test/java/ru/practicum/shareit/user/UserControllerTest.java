@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
     @InjectMocks
-    UserController userController;
+    private UserController userController;
     @Mock
     private UserService userService;
     private final UserDto userDto = new UserDto(0L, "test","test@mail.com");
@@ -71,7 +71,7 @@ class UserControllerTest {
 
     @Test
     public void deleteUser() {
-        ResponseEntity<?> res = userController.deleteUser(1L);
+        ResponseEntity<Void> res = userController.deleteUser(1L);
         assertThat(res.getStatusCodeValue()).isEqualTo(200);
     }
 

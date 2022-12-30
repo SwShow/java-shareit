@@ -2,11 +2,9 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.exception.BadRequestException;
 
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -49,10 +47,7 @@ public class BookingController {
                                                             @RequestParam(required = false, defaultValue = "0") int from,
                                                             @Min(1) @RequestParam(required = false, defaultValue = "20") int size) {
         log.info("поступил запрос на получение списка бронирований со статусом {} пользователя с id {}", state, userId);
-        if (from < 0) {
-            throw new BadRequestException("параметры пагинации не могут быть отрицательными");
-        }
-        return ResponseEntity.ok(bookingService.findAllForBooker(PageRequest.of(from / size, size), userId, state));
+        return ResponseEntity.ok(bookingService.findAllForBooker(from, size, userId, state));
     }
 
     @GetMapping("/owner")
@@ -61,9 +56,6 @@ public class BookingController {
                                             @RequestParam(required = false, defaultValue = "0") int from,
                                             @Min(1) @RequestParam(required = false, defaultValue = "20") int size) {
         log.info("поступил запрос на получение списка бронирований со статусом {} для вещей пользователя с id {}", state, owner);
-        if (from < 0) {
-            throw new BadRequestException("параметры пагинации не могут быть отрицательными");
-        }
-        return ResponseEntity.ok(bookingService.findAllForOwner(PageRequest.of(from / size, size), owner, state));
+        return ResponseEntity.ok(bookingService.findAllForOwner(from, size, owner, state));
     }
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ import static ru.practicum.shareit.booking.BookingStatus.WAITING;
 @ExtendWith(MockitoExtension.class)
 class BookingControllerTest {
   @InjectMocks
-    BookingController bookingController;
+    private BookingController bookingController;
     @Mock
     private BookingService bookingService;
 
@@ -61,7 +60,7 @@ class BookingControllerTest {
 
     @Test
     void getAllForBooker() {
-        when(bookingService.findAllForBooker(PageRequest.of(0 / 5, 5), 1L, "WAITING"))
+        when(bookingService.findAllForBooker(0 / 5, 5, 1L, "WAITING"))
                 .thenReturn(List.of(bookingDto2));
 
         ResponseEntity<List<BookingDto>> res = bookingController.getAllForBooker(1L, "WAITING", 0, 5);
@@ -71,7 +70,7 @@ class BookingControllerTest {
 
     @Test
     void getAllForOwner() {
-        when(bookingService.findAllForOwner(PageRequest.of(0 / 5, 5), 1L, "WAITING"))
+        when(bookingService.findAllForOwner(0 / 5, 5, 1L, "WAITING"))
                 .thenReturn(List.of(bookingDto2));
 
         ResponseEntity<List<BookingDto>> res = bookingController.getAllForOwner(1L, "WAITING", 0, 5);

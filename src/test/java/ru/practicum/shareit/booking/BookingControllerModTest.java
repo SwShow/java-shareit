@@ -41,8 +41,8 @@ class BookingControllerModTest {
     private ItemRepository itemRepository;
     @Autowired
     private BookingRepository bookingRepository;
-    UserDto userDto;
-    ItemDto itemDto;
+    private UserDto userDto;
+    private ItemDto itemDto;
     private UserDto userDto1;
     private BookingDto bookingDto;
 
