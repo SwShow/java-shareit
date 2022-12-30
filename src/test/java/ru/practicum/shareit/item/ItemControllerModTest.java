@@ -185,7 +185,7 @@ class ItemControllerModTest {
         booking.setId(1L);
         UserDto user2 = userController.create(new UserDto(0L, "name", "email2@email.com")).getBody();
         bookingController.save(new BookingDto(0L, 1L,
-                LocalDateTime.of(2022, 12, 30, 12, 30),
+                LocalDateTime.of(2022, 12, 31, 12, 30),
                 LocalDateTime.of(2023, 11, 10, 13, 0),
                 itemDto, user2, WAITING), user2.getId()).getBody();
         bookingController.approve(1L, true, 1L);
