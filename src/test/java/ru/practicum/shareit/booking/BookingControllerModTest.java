@@ -59,7 +59,7 @@ class BookingControllerModTest {
                 new ArrayList<>(), 0L);
 
         bookingDto = new BookingDto(0L, 1L,
-                LocalDateTime.of(2022, 12, 30, 12, 30),
+                LocalDateTime.of(2022, 12, 31, 12, 30),
                 LocalDateTime.of(2023, 11, 10, 13, 0),
                 itemDto, userDto, WAITING);
     }
