@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -13,7 +14,6 @@ import ru.practicum.shareit.item.model.Item;
 
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,7 +57,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto approve(long userId, long bookingId, boolean status) {
-        getUser(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("пользователь не найден"));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("указанное бронирование не существует"));
         if (booking.getItem().getOwner().getId() != userId) {
@@ -72,7 +73,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getById(long bookingId, long userId) {
-        getUser(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("пользователь не найден"));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("указанное бронирование не существует"));
         long id = booking.getItem().getId();
@@ -88,23 +90,29 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllForBooker(long bookerId, String state) {
+    public List<BookingDto> findAllForBooker(int from, int size, long bookerId, String state) {
+        if (from < 0) {
+            throw new BadRequestException("параметры пагинации не могут быть отрицательными");
+        }
         getUser(bookerId);
 
-        return findBookingsForBooking(state, bookerId)
+        return findBookingsForBooking(state, bookerId, PageRequest.of(from / size, size))
                 .stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDto> findAllForOwner(long ownerId, String state) {
+    public List<BookingDto> findAllForOwner(int from, int size, long ownerId, String state) {
+        if (from < 0) {
+            throw new BadRequestException("параметры пагинации не могут быть отрицательными");
+        }
         getUser(ownerId);
         if (itemRepository.findAllByOwnerId(ownerId).isEmpty()) {
             throw new ValidationException("у вас нет вещей");
         }
 
-        return findBookingsForOwner(state, ownerId)
+        return findBookingsForOwner(state, ownerId, PageRequest.of(from / size, size))
                 .stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
@@ -115,12 +123,12 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + userId + " не существует."));
     }
 
-    public List<Booking> findBookingsForOwner(String state, long id) {
+    public List<Booking> findBookingsForOwner(String state, long id, PageRequest pageRequest) {
         List<Booking> bookings;
 
         switch (state) {
             case "ALL":
-                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(id);
+                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(id, pageRequest);
                 return bookings;
             case "WAITING":
             case "APPROVED":
@@ -151,12 +159,12 @@ public class BookingServiceImpl implements BookingService {
         return bookings;
     }
 
-    public List<Booking> findBookingsForBooking(String state, long id) {
+    public List<Booking> findBookingsForBooking(String state, long id, PageRequest pageRequest) {
         List<Booking> bookings;
 
         switch (state) {
             case "ALL":
-                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(id);
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(id, pageRequest);
                 return bookings;
             case "WAITING":
             case "APPROVED":

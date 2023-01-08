@@ -15,4 +15,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> search(String text);
 
     List<Item> findAllByOwnerId(long ownerId);
+
+    List<Item> findItemsByRequestId(Long requestId);
+
+    @Query(" select i from Item i " +
+            "where i.request is not null")
+    List<Item> findAllWithNonNullRequest();
 }

@@ -19,8 +19,8 @@
         <java.version>11</java.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.24</org.projectlombok.version>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+       <!-- <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>-->
     </properties>
 
     <dependencies>
@@ -71,6 +71,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>
@@ -196,6 +202,9 @@
                     <version>0.8.8</version>
                     <configuration>
                         <output>file</output>
+                        <excludes>
+                            <exclude>**/*MapperImpl.*</exclude>
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>
@@ -210,6 +219,9 @@
                                 <goal>check</goal>
                             </goals>
                             <configuration>
+                                <excludes>
+                                    <exclude>**/*MapperImpl.*</exclude>
+                                </excludes>
                                 <rules>
                                     <rule>
                                         <element>BUNDLE</element>

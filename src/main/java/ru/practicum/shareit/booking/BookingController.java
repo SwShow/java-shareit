@@ -2,11 +2,12 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 
+import javax.validation.constraints.Min;
+import java.util.List;
 
 /**
  * TODO Sprint add-bookings.
@@ -19,38 +20,42 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody BookingDto bookingDto,
+    public ResponseEntity<BookingDto> save(@RequestBody BookingDto bookingDto,
                                   @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("поступил запрос на создание бронирования {}", bookingDto);
-        return new ResponseEntity<>(bookingService.save(bookingDto, userId), HttpStatus.CREATED);
+        return ResponseEntity.ok(bookingService.save(bookingDto, userId));
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity<?> approve(@PathVariable long bookingId,
+    public ResponseEntity<BookingDto> approve(@PathVariable long bookingId,
                                      @RequestParam Boolean approved,
                                      @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("поступил запрос на изменение статуса бронирования с id {}", bookingId);
-        return new ResponseEntity<>(bookingService.approve(userId, bookingId, approved), HttpStatus.OK);
+        return ResponseEntity.ok(bookingService.approve(userId, bookingId, approved));
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<?> getById(@PathVariable long bookingId,
+    public ResponseEntity<BookingDto> getById(@PathVariable long bookingId,
                                      @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("пользователем с id {} запрошено бронирование с id {}", userId, bookingId);
-        return new ResponseEntity<>(bookingService.getById(bookingId, userId), HttpStatus.OK);
+        return ResponseEntity.ok(bookingService.getById(bookingId, userId));
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllForBooker(@RequestHeader("X-Sharer-User-Id") long userId,
-                                             @RequestParam(required = false, defaultValue = "ALL") String state) {
+    public ResponseEntity<List<BookingDto>> getAllForBooker(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                            @RequestParam(required = false, defaultValue = "ALL") String state,
+                                                            @RequestParam(required = false, defaultValue = "0") int from,
+                                                            @Min(1) @RequestParam(required = false, defaultValue = "20") int size) {
         log.info("поступил запрос на получение списка бронирований со статусом {} пользователя с id {}", state, userId);
-        return new ResponseEntity<>(bookingService.findAllForBooker(userId, state), HttpStatus.OK);
+        return ResponseEntity.ok(bookingService.findAllForBooker(from, size, userId, state));
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<?> getAllForOwner(@RequestHeader("X-Sharer-User-Id") long owner,
-                                            @RequestParam(required = false, defaultValue = "ALL") String state) {
+    public ResponseEntity<List<BookingDto>> getAllForOwner(@RequestHeader("X-Sharer-User-Id") long owner,
+                                            @RequestParam(required = false, defaultValue = "ALL") String state,
+                                            @RequestParam(required = false, defaultValue = "0") int from,
+                                            @Min(1) @RequestParam(required = false, defaultValue = "20") int size) {
         log.info("поступил запрос на получение списка бронирований со статусом {} для вещей пользователя с id {}", state, owner);
-        return new ResponseEntity<>(bookingService.findAllForOwner(owner, state), HttpStatus.OK);
+        return ResponseEntity.ok(bookingService.findAllForOwner(from, size, owner, state));
     }
 }

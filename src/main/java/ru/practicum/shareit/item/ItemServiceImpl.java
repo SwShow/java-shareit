@@ -14,6 +14,8 @@ import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -34,18 +36,32 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final CommentMapper commentMapper;
     private final ItemMapper itemMapper;
+    private final ItemRequestRepository itemRequestRepository;
 
 
     @Override
     public ItemDto createItem(ItemDto itemDto, Optional<Long> userId) throws ValidationException {
+        Optional<Long> requestId = Optional.ofNullable(itemDto.getRequestId());
+        log.info("requestId:" + requestId);
+        ItemRequest request = null;
+
+        if (requestId.isPresent() && requestId.get() > 0L) {
+            request = itemRequestRepository.findById(requestId.get())
+                    .orElseThrow(() -> new NoSuchElementException("запрос c идентификатором " + requestId + " не существует"));
+        }
+
+        log.info("request:" + request);
         if (userId.isPresent() && userId.get() > 0) {
             if (userRepository.findById(userId.get()).isEmpty()) {
                 throw new NoSuchElementException("пользователь не существует");
             }
             Item item = itemMapper.toItem(itemDto);
+            log.info("item:" + item);
             item.setOwner(userRepository.findById(userId.get()).get());
-            item.setComments(new ArrayList<>());
-            return itemMapper.toItemDto(itemRepository.save(item), null, null, new ArrayList<>());
+            item.setRequest(request);
+            Item item1 = itemRepository.save(item);
+            log.info("item:" + item1);
+            return itemMapper.toItemDto(item1);
         }
         throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
@@ -72,7 +88,10 @@ public class ItemServiceImpl implements ItemService {
                 Booking nextBooking = bookingNext(item);
 
                 List<CommentDto> commentsDto = commentDto(item);
-                return itemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto);
+                item.setLastBooking(lastBooking);
+                item.setNextBooking(nextBooking);
+                item.setComments(commentsDto);
+                return itemMapper.toItemDto(item);
             }
             throw new NoSuchElementException("нельзя редактировать чужие вещи!");
         }
@@ -109,7 +128,10 @@ public class ItemServiceImpl implements ItemService {
                     .orElse(null);
 
             List<CommentDto> commentsDto = commentDto(item);
-            return itemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto);
+            item.setLastBooking(lastBooking);
+            item.setNextBooking(nextBooking);
+            item.setComments(commentsDto);
+            return itemMapper.toItemDto(item);
         }
         throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
@@ -135,7 +157,7 @@ public class ItemServiceImpl implements ItemService {
             item.setLastBooking(lastBooking);
             item.setNextBooking(nextBooking);
             item.setComments(commentsDto);
-            list.add(itemMapper.toItemDto(item, lastBooking, nextBooking, commentsDto));
+            list.add(itemMapper.toItemDto(item));
         }
         return list;
     }
