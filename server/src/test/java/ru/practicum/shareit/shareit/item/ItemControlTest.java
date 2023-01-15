@@ -1,6 +1,5 @@
 package ru.practicum.shareit.shareit.item;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.shareit.booking.BookingController;
 import ru.practicum.shareit.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.shareit.booking.model.Booking;
-import ru.practicum.shareit.shareit.exception.ValidationException;
+import ru.practicum.shareit.shareit.exception.BadRequestException;
 import ru.practicum.shareit.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.shareit.item.comment.dto.CommentDtoLittle;
@@ -30,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,7 +36,7 @@ import static ru.practicum.shareit.shareit.booking.BookingStatus.WAITING;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ItemControllerModTest {
+class ItemControlTest {
     @Autowired
     private ItemController itemController;
     @Autowired
@@ -83,7 +81,8 @@ class ItemControllerModTest {
     @Test
     void createTest() {
         UserDto user = userController.create(userDto);
-        ItemDto item = itemController.createItem(Optional.of(1L), itemDto);
+        itemController.createItem(1L, itemDto);
+        ItemDto item = itemController.getItemOfId(1L, 1L);
         assertEquals(item.getId(), itemController.getItemOfId(user.getId(), item.getId()).getId());
     }
 
@@ -94,73 +93,45 @@ class ItemControllerModTest {
         requestController.addItemRequest(user.getId(), requestDto);
         itemDto.setRequestId(1L);
         userController.create(new UserDto(0L, "name", "user1@email.com"));
-        ItemDto item = itemController.createItem(Optional.of(2L), itemDto);
+        ItemDto item = itemController.createItem(2L, itemDto);
         assert item != null;
         assertEquals(item.getName(), itemController.getItemOfId(2L, 1L).getName());
     }
 
     @Test
-    void createByWrongUser() {
-        assertThrows(NoSuchElementException.class, () -> itemController.createItem(
-                Optional.of(1L), itemDto));
-    }
-
-    @Test
-    void createWithWrongItemRequest() {
-        itemDto.setRequestId(10L);
-        userController.create(userDto);
-        assertThrows(NoSuchElementException.class, () -> itemController.createItem(
-                Optional.of(1L), itemDto));
-    }
-
-    @Test
     void getAllUserItems() {
         UserDto user = userController.create(userDto);
-        ItemDto item = itemController.createItem(Optional.of(1L), itemDto);
-        assertEquals(1, itemController.getItems(Optional.of(user.getId())).size());
+        ItemDto item = itemController.createItem(1L, itemDto);
+        assertEquals(1, itemController.getItems(user.getId()).size());
     }
 
     @Test
     void updateTest() {
         userController.create(userDto);
-        itemController.createItem(Optional.of(1L), itemDto);
+        itemController.createItem(1L, itemDto);
         ItemDto item = new ItemDto(0L, "new name", "updateDescription", false, null,
                 null, new ArrayList<>(), 0L);
-        itemController.updateItem(Optional.of(1L), 1L, item);
+        itemController.updateItem(1L, 1L, item);
         assertEquals(item.getDescription(), itemController.getItemOfId(1L, 1L).getDescription());
     }
 
     @Test
     void updateForWrongItemTest() {
-        assertThrows(NoSuchElementException.class, () -> itemController.updateItem(Optional.of(1L), 1L, itemDto));
-    }
-
-    @Test
-    public void updateItemWithoutId() {
-        Assertions.assertThrows(ValidationException.class, () -> itemController.updateItem(Optional.of(-1L), 1L, itemDto));
-    }
-
-    @Test
-    void updateByWrongUserTest() {
-        userController.create(userDto);
-        itemController.createItem(Optional.of(1L), itemDto);
-        itemDto.setName("new name");
-        assertThrows(NoSuchElementException.class, () -> itemController.updateItem(
-                Optional.of(1L), 10L, itemDto));
+        assertThrows(NoSuchElementException.class, () -> itemController.updateItem(1L, 1L, itemDto));
     }
 
     @Test
     void searchTest() {
         userController.create(userDto);
-        itemController.createItem(Optional.of(1L), itemDto);
-        assertEquals(1, itemController.getItemOfText(Optional.of(1L), "Desc").size());
+        itemController.createItem(1L, itemDto);
+        assertEquals(1, itemController.getItemOfText(1L, "Desc").size());
     }
 
     @Test
     void searchEmptyTextTest() {
         userController.create(userDto);
-        itemController.createItem(Optional.of(1L), itemDto);
-        assertEquals(new ArrayList<ItemDto>(), itemController.getItemOfText(Optional.of(1L), ""));
+        itemController.createItem(1L, itemDto);
+        assertEquals(new ArrayList<ItemDto>(), itemController.getItemOfText(1L, ""));
     }
 
     @Test
@@ -170,7 +141,7 @@ class ItemControllerModTest {
         CommentDto newCommentDto = commentMapper.toCommentDto(newComment);
         newCommentDto.setAuthorName(userDto.getName());
         UserDto user = userController.create(userDto);
-        ItemDto item = itemController.createItem(Optional.of(1L), itemDto);
+        ItemDto item = itemController.createItem(1L, itemDto);
         assert item != null;
         ItemDto.BookingForItemDto lastBooking = item.getLastBooking();
         ItemDto.BookingForItemDto nextBooking = item.getNextBooking();
@@ -194,25 +165,7 @@ class ItemControllerModTest {
         List<CommentDto> comments = item1.getComments();
         comment1.setCreated(LocalDateTime.now());
 
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, item.getId(), user2.getId()));
-    }
-
-    @Test
-    void createCommentByWrongUser() {
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, 1L, 1L));
-    }
-
-    @Test
-    void createCommentToWrongItem() {
-        userController.create(userDto);
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, 1L, 1L));
-        itemController.createItem(Optional.of(1L), itemDto);
-        assertThrows(ValidationException.class, () -> itemController.createComment(comment, 3L, 1L));
-    }
-
-    @Test
-    void getAllWithWrongFrom() {
-        assertThrows(NoSuchElementException.class, () -> itemController.getItems(Optional.of(1L)));
+        assertThrows(BadRequestException.class, () -> itemController.createComment(comment, item.getId(), user2.getId()));
     }
 
 }

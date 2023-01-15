@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.shareit.booking.model.Booking;
 import ru.practicum.shareit.shareit.booking.BookingRepository;
-import ru.practicum.shareit.shareit.exception.ValidationException;
+import ru.practicum.shareit.shareit.exception.BadRequestException;
+import ru.practicum.shareit.shareit.exception.NotFoundException;
 import ru.practicum.shareit.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.shareit.item.comment.dto.CommentDtoLittle;
@@ -40,38 +41,30 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public ItemDto createItem(ItemDto itemDto, Optional<Long> userId) throws ValidationException {
-        Optional<Long> requestId = Optional.ofNullable(itemDto.getRequestId());
+    public ItemDto createItem(ItemDto itemDto, long userId) {
+        long requestId = itemDto.getRequestId();
         log.info("requestId:" + requestId);
         ItemRequest request = null;
-
-        if (requestId.isPresent() && requestId.get() > 0L) {
-            request = itemRequestRepository.findById(requestId.get())
-                    .orElseThrow(() -> new NoSuchElementException("запрос c идентификатором " + requestId + " не существует"));
+        if (requestId != 0L) {
+            request = itemRequestRepository.findById(requestId)
+                    .orElseThrow(() -> new NotFoundException("запрос c идентификатором " + requestId + " не существует"));
         }
-
         log.info("request:" + request);
-        if (userId.isPresent() && userId.get() > 0) {
-            if (userRepository.findById(userId.get()).isEmpty()) {
-                throw new NoSuchElementException("пользователь не существует");
-            }
             Item item = itemMapper.toItem(itemDto);
             log.info("item:" + item);
-            item.setOwner(userRepository.findById(userId.get()).get());
+            item.setOwner(userRepository.findById(userId).get());
             item.setRequest(request);
             Item item1 = itemRepository.save(item);
             log.info("item:" + item1);
             return itemMapper.toItemDto(item1);
-        }
-        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
+
     }
 
     @Override
-    public ItemDto updateItem(Optional<Long> userId, Long itemId, ItemDto itemDto) throws ValidationException {
-        if (userId.isPresent() && userId.get() > 0) {
+    public ItemDto updateItem(long userId, Long itemId, ItemDto itemDto) {
             Item item = itemRepository.findById(itemId).get();
             log.info("вещь для редактирования:" + item);
-            if (item.getOwner().getId() == userId.get()) {
+            if (item.getOwner().getId() == userId) {
                 if (itemDto.getName() != null) {
                     item.setName(itemDto.getName());
                 }
@@ -93,27 +86,22 @@ public class ItemServiceImpl implements ItemService {
                 item.setComments(commentsDto);
                 return itemMapper.toItemDto(item);
             }
-            throw new NoSuchElementException("нельзя редактировать чужие вещи!");
-        }
-        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
+            throw new NotFoundException("нельзя редактировать чужие вещи!");
     }
 
     @Override
-    public List<ItemDto> getItems(Optional<Long> userId) throws ValidationException {
-        if (userId.isPresent() && userId.get() > 0) {
-            userRepository.findById(userId.get())
+    public List<ItemDto> getItems(long userId)  {
+            userRepository.findById(userId)
                     .orElseThrow(() -> new NoSuchElementException("пользователь c идентификатором " + userId + " не существует"));
 
-            List<Item> items = itemRepository.findAllByOwnerId(userId.get());
+            List<Item> items = itemRepository.findAllByOwnerId(userId);
 
             return getItemDto(items);
-        }
-        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
 
     @Override
-    public ItemDto getItemOfId(Long userId, Long itemId) throws ValidationException {
-        if (userId > 0 && itemId > 0) {
+    public ItemDto getItemOfId(Long userId, Long itemId) {
+
             Item item = itemRepository.findById(itemId)
                     .orElseThrow(() -> new NoSuchElementException("вещь c идентификатором " + itemId + " не существует"));
 
@@ -132,18 +120,15 @@ public class ItemServiceImpl implements ItemService {
             item.setNextBooking(nextBooking);
             item.setComments(commentsDto);
             return itemMapper.toItemDto(item);
-        }
-        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
     }
 
     @Override
-    public List<ItemDto> getItemOfText(Optional<Long> userId, String text) throws ValidationException {
-        if (userId.isPresent() && userId.get() > 0) {
+    public List<ItemDto> getItemOfText(long userId, String text) {
+
             if (text == null || text.length() == 0) return new ArrayList<>();
             List<Item> its = itemRepository.search(text);
             return getItemDto(its);
-        }
-        throw new ValidationException("идентификатор пользователя отрицательный или отсутствует");
+
     }
 
     private List<ItemDto> getItemDto(List<Item> its) {
@@ -163,15 +148,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDto createComment(CommentDtoLittle commentDtoLittle, Long itemId, long userId) {
+    public CommentDto createComment(CommentDtoLittle commentDtoLittle, long itemId, long userId) {
         if (commentDtoLittle.getText() == null || commentDtoLittle.getText().equals("")) {
-            throw new ValidationException("отзыв не может быть пустым");
+            throw new BadRequestException("отзыв не может быть пустым");
         }
 
         Long bookingsCount = bookingRepository.countAllByItemIdAndBookerIdAndEndBefore(itemId, userId, LocalDateTime.now());
 
         if (bookingsCount == null || bookingsCount == 0) {
-            throw new ValidationException("сначала надо взять эту вещь");
+            throw new BadRequestException("сначала надо взять эту вещь");
         }
 
         Item item = itemRepository.findById(itemId)

@@ -1,4 +1,3 @@
-
 package ru.practicum.shareit.shareit.request;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -9,12 +8,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.shareit.item.model.Item;
 import ru.practicum.shareit.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.shareit.request.dto.ItemRequestMapper;
+import ru.practicum.shareit.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.shareit.user.UserController;
 import ru.practicum.shareit.shareit.user.UserRepository;
 import ru.practicum.shareit.shareit.user.dto.UserDto;
-import ru.practicum.shareit.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -29,10 +29,6 @@ class ItemRequestControllerTest {
     @Autowired
     private UserController userController;
     @Autowired
-    private ItemRequestMapper mapper;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     private ItemRequestRepository itemRepository;
@@ -40,6 +36,17 @@ class ItemRequestControllerTest {
     private CommentRepository commentRepository;
     private ItemRequestDto itemRequestDto;
     private UserDto userDto;
+    private final User us = User.builder()
+            .id(1L)
+            .name("name")
+            .email("user@email.com")
+            .build();
+    private final ItemRequest iR = ItemRequest.builder()
+            .id(1L)
+            .description("item request description")
+            .requester(us)
+            .created(LocalDateTime.now())
+            .build();
 
     @BeforeEach
     public void clearContext() {
@@ -60,8 +67,8 @@ class ItemRequestControllerTest {
         UserDto user = userController.create(userDto);
         UserDto user2 = userController.create(new UserDto(0L, "name", "user2@email.com"));
         ItemRequestDto itemRequest = requestController.addItemRequest(user.getId(), itemRequestDto);
-        Item item = new Item(0L, "item", "desc", true, userMapper.toUser(user2),
-                mapper.toItemRequest(itemRequest));
+        Item item = new Item(0L, "item", "desc", true, us,
+                iR);
 
         assertEquals(0, requestController.getItemRequestsOtherSorted(user.getId(), 0, 20).size());
         assertEquals(0, requestController.getItemRequestsOwnerSorted(user2.getId(), 0,  20).size());
@@ -72,16 +79,11 @@ class ItemRequestControllerTest {
         UserDto user = userController.create(userDto);
         UserDto user2 = userController.create(new UserDto(0L, "name", "user2@email.com"));
         ItemRequestDto itemRequest = requestController.addItemRequest(user.getId(), itemRequestDto);
-        Item item = new Item(0L, "item", "desc", true, userMapper.toUser(user2),
-                mapper.toItemRequest(itemRequest));
+        Item item = new Item(0L, "item", "desc", true, us,
+                iR);
 
         assertThrows(NoSuchElementException.class, () -> requestController.getItemRequestsOwnerSorted(
                 -1L, 0, (int) user.getId()).size());
-    }
-
-    @Test
-    void createByWrongUserTest() {
-        assertThrows(NoSuchElementException.class, () -> requestController.addItemRequest(1L, itemRequestDto));
     }
 
     @Test
@@ -114,6 +116,14 @@ class ItemRequestControllerTest {
     void getAllByWrongUser() {
         assertThrows(NoSuchElementException.class, () -> requestController.getItemRequestsOtherSorted(
                 1L, 0, 10));
+    }
+
+    @Test
+    void getItemRequestOfId() {
+        UserDto user = userController.create(userDto);
+        requestController.addItemRequest(user.getId(), itemRequestDto);
+        ItemRequestDto res = requestController.getItemRequestOfId(1L, 1L);
+        assertEquals("item request description", res.getDescription());
     }
 
 }

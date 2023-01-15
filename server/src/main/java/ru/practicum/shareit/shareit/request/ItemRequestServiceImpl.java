@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.shareit.exception.ValidationException;
+import ru.practicum.shareit.shareit.exception.NotFoundException;
 import ru.practicum.shareit.shareit.item.ItemRepository;
 import ru.practicum.shareit.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.shareit.item.dto.ItemMapper;
@@ -34,9 +34,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemMapper itemMapper;
 
     @Override
-    public ItemRequestDto addItemRequest(Long userId, ItemRequestDto itemRequestDto) {
+    public ItemRequestDto addItemRequest(long userId, ItemRequestDto itemRequestDto) {
         if (itemRequestDto.getDescription() == null || itemRequestDto.getDescription().equals("")) {
-            throw new ValidationException("отзыв не может быть пустым");
+            throw new NotFoundException("отзыв не может быть пустым");
         }
         User user = getUser(userId);
         ItemRequest itemRequest = mapper.toItemRequest(itemRequestDto);
@@ -46,21 +46,21 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getItemRequestsOwnerSorted(Long userId, PageRequest pageReq) {
+    public List<ItemRequestDto> getItemRequestsOwnerSorted(long userId, PageRequest pageReq) {
         getUser(userId);
         List<ItemRequest> requests = repository.findAllByRequesterIdOrderByCreatedDesc(pageReq, userId);
         return addItemsToRequest(requests);
     }
 
     @Override
-    public List<ItemRequestDto> getItemRequestsOtherSorted(Long userId, PageRequest pageReq) {
+    public List<ItemRequestDto> getItemRequestsOtherSorted(long userId, PageRequest pageReq) {
         getUser(userId);
         List<ItemRequest> requests = repository.findAllByRequesterIdNotOrderByCreatedDesc(pageReq, userId);
         return addItemsToRequest(requests);
     }
 
     @Override
-    public ItemRequestDto getItemRequestOfId(Long userId, Long requestId) {
+    public ItemRequestDto getItemRequestOfId(long userId, long requestId) {
         getUser(userId);
 
         ItemRequest request = repository.findById(requestId)
@@ -76,7 +76,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return requestDto;
     }
 
-    private User getUser(Long userId) {
+    private User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("пользователя c идентификатором " + userId + " нет"));
     }

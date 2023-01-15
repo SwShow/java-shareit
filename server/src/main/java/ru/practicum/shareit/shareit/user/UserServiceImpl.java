@@ -60,8 +60,4 @@ public class UserServiceImpl implements UserService {
         return UserMapper.INSTANCE.toDto(user);
     }
 
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
 }

@@ -1,15 +1,15 @@
 package ru.practicum.shareit.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.shareit.booking.model.Booking;
-import ru.practicum.shareit.shareit.item.model.Item;
 import ru.practicum.shareit.shareit.item.ItemRepository;
-import ru.practicum.shareit.shareit.user.model.User;
+import ru.practicum.shareit.shareit.item.model.Item;
 import ru.practicum.shareit.shareit.user.UserRepository;
+import ru.practicum.shareit.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
@@ -18,23 +18,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static ru.practicum.shareit.shareit.booking.BookingStatus.WAITING;
 
 @DataJpaTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class BookingRepositoryTest {
-    @Autowired
-    private BookingRepository bookingRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ItemRepository itemRepository;
-
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
     private User user;
-
     private Item item;
-
     private User user2;
-
     private Booking booking;
 
     @BeforeEach

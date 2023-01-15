@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.shareit.exception.ValidationException;
 import ru.practicum.shareit.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.shareit.item.comment.dto.CommentDtoLittle;
 import ru.practicum.shareit.shareit.item.dto.ItemDto;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * TODO Sprint add-controllers.
@@ -25,8 +23,8 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping()
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
-                              @RequestBody ItemDto itemDto) throws ValidationException {
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId,
+                              @RequestBody ItemDto itemDto) {
         log.info("поступил запрос на добавление вещи:" + itemDto + " пользователем:" + userId);
 
         return itemService.createItem(itemDto, userId);
@@ -34,32 +32,32 @@ public class ItemController {
 
     // только для владельца
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId,
                               @PathVariable Long itemId,
-                              @RequestBody ItemDto itemDto) throws ValidationException {
+                              @RequestBody ItemDto itemDto) {
         log.info("поступил запрос на редактирование вещи:" + itemDto + " владельцем:" + userId);
         return itemService.updateItem(userId, itemId, itemDto);
     }
 
     // для любого пользователя
     @GetMapping("/{itemId}")
-    public ItemDto getItemOfId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                               @PathVariable Long itemId) throws ValidationException {
+    public ItemDto getItemOfId(@RequestHeader("X-Sharer-User-Id") long userId,
+                               @PathVariable Long itemId) {
         log.info("поступил запрос на просмотр вещи по идентификатору:" + itemId);
         return itemService.getItemOfId(userId, itemId);
     }
 
     // только для владельца
     @GetMapping()
-    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId) throws ValidationException {
+    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("поступил запрос на просмотр владельцем всех своих вещей,idUser=" + userId);
         return itemService.getItems(userId);
     }
 
     // только доступные для аренды вещи
     @GetMapping("/search")
-    public List<ItemDto> getItemOfText(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
-                                       @RequestParam("text") String text) throws ValidationException {
+    public List<ItemDto> getItemOfText(@RequestHeader("X-Sharer-User-Id") long userId,
+                                       @RequestParam("text") String text) {
         log.info("поступил запрос на просмотр доступной для аренды вещи:" + text);
         return itemService.getItemOfText(userId, text);
     }

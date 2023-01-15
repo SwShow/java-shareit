@@ -44,9 +44,4 @@ public class UserController {
         return userService.findUserById(id);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") Long id) {
-        log.info("поступил запрос на получение данных пользователя");
-        userService.deleteUser(id);
-    }
 }

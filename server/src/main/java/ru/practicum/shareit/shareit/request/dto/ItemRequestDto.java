@@ -14,6 +14,7 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ItemRequestDto {
 
     private long id;

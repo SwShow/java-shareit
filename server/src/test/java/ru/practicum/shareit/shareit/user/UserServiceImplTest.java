@@ -9,11 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.shareit.user.dto.UserDto;
 import ru.practicum.shareit.shareit.user.model.User;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.NoSuchElementException;
 
 
 @Transactional
@@ -35,19 +32,6 @@ class UserServiceImplTest {
 
         Assertions.assertEquals(newUser.getName(), user.getName());
         Assertions.assertEquals(newUser.getEmail(), user.getEmail());
-    }
-
-    @Test
-    public void deleteUser() {
-
-        UserDto newUser = new UserDto();
-        newUser.setEmail("test@mail.ru");
-        newUser.setName("test");
-
-        UserDto dto = userService.createUser(newUser);
-        Long id = dto.getId();
-        userService.deleteUser(id);
-        assertThrows(NoSuchElementException.class, () -> userService.findUserById(id));
     }
 
 }

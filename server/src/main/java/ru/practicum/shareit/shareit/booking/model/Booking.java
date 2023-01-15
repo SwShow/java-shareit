@@ -5,9 +5,7 @@ package ru.practicum.shareit.shareit.booking.model;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.shareit.booking.BookingStatus;
 import ru.practicum.shareit.shareit.item.model.Item;
 import ru.practicum.shareit.shareit.user.model.User;
@@ -18,6 +16,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "bookings")

@@ -18,8 +18,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
-@ToString
 @Table(name = "items")
 public class Item {
     @Id
