@@ -10,8 +10,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.user.dto.UsergDto;
 
-import javax.validation.Valid;
-
 @Service
 public class UsergateClient extends BaseClient {
     private static final String API_PREFIX = "/users";
@@ -43,7 +41,7 @@ public class UsergateClient extends BaseClient {
         return patch("/" + userId, requestDto);
     }
 
-    public ResponseEntity<Object> deleteUser(Long userId) {
-        return delete("/" + userId);
+    public void deleteUser(Long userId) {
+        delete("/" + userId);
     }
 }
