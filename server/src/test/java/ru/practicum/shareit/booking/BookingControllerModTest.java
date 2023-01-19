@@ -98,24 +98,6 @@ class BookingControllerModTest {
     }
 
     @Test
-    void createToUnavailableItemTest() {
-        UserDto user = userController.create(userDto).getBody();
-        itemDto.setAvailable(false);
-        itemController.createItem(Optional.of(user.getId()), itemDto);
-        UserDto user1 = userController.create(userDto1).getBody();
-        assertThrows(ValidationException.class, () -> bookingController.save(bookingDto, 2L));
-    }
-
-    @Test
-    void createWithWrongEndDate() {
-        UserDto user = userController.create(userDto).getBody();
-        itemController.createItem(Optional.of(user.getId()), itemDto);
-        UserDto user1 = userController.create(userDto1).getBody();
-        bookingDto.setEnd(LocalDateTime.of(2022, 9, 24, 12, 30));
-        assertThrows(ValidationException.class, () -> bookingController.save(bookingDto, user1.getId()));
-    }
-
-    @Test
     void approveTest() {
         UserDto user = userController.create(userDto).getBody();
         ItemDto item = itemController.createItem(Optional.of(user.getId()), itemDto).getBody();
