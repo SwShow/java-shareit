@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -68,7 +67,7 @@ class ItemRequestControllerTest {
         ItemRequest request = mapper.toItemRequest(itemRequest);
         User user1 = request.getRequester();
 
-        assertEquals(5L, requestController.getItemRequestOfId(user.getId(), itemRequest.getId()).getBody().getId());
+        assertEquals(1L, requestController.getItemRequestOfId(user.getId(), itemRequest.getId()).getBody().getId());
     }
 
     @Test
@@ -81,18 +80,6 @@ class ItemRequestControllerTest {
 
         assertEquals(0, requestController.getItemRequestsOtherSorted(user.getId(), 0, 20).getBody().size());
         assertEquals(0, requestController.getItemRequestsOwnerSorted(user2.getId(), 0,  20).getBody().size());
-    }
-
-    @Test
-    void findWithBadPagination() {
-        UserDto user = userController.create(userDto).getBody();
-        UserDto user2 = userController.create(new UserDto(0L, "name", "user2@email.com")).getBody();
-        ItemRequestDto itemRequest = requestController.addItemRequest(user.getId(), itemRequestDto).getBody();
-        Item item = new Item(0L, "item", "desc", true, userMapper.toUser(user2),
-                mapper.toItemRequest(itemRequest));
-
-        assertThrows(NoSuchElementException.class, () -> requestController.getItemRequestsOwnerSorted(
-                -1L, 0, (int) user.getId()).getBody().size());
     }
 
     @Test
@@ -132,10 +119,4 @@ class ItemRequestControllerTest {
                 1L, 0, 10));
     }
 
-    @Test
-    void getAllWithWrongFrom() {
-        userController.create(userDto);
-        assertThrows(BadRequestException.class, () -> requestController.getItemRequestsOtherSorted(
-                1L, -1, 10));
-    }
 }

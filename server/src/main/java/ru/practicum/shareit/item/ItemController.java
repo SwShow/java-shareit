@@ -28,7 +28,7 @@ public class ItemController {
 
     @PostMapping()
     public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
-                                        @Valid @RequestBody ItemDto itemDto) throws ValidationException {
+                                              @RequestBody ItemDto itemDto) throws ValidationException {
         log.info("поступил запрос на добавление вещи:" + itemDto + " пользователем:" + userId);
 
         return ResponseEntity.ok(itemService.createItem(itemDto, userId));
@@ -36,15 +36,17 @@ public class ItemController {
 
     // только для владельца
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId, @PathVariable Long itemId,
-                                        @RequestBody ItemDto itemDto) throws ValidationException {
+    public ResponseEntity<ItemDto> updateItem(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
+                                              @PathVariable Long itemId,
+                                              @RequestBody ItemDto itemDto) throws ValidationException {
         log.info("поступил запрос на редактирование вещи:" + itemDto + " владельцем:" + userId);
         return ResponseEntity.ok(itemService.updateItem(userId, itemId, itemDto));
     }
 
     // для любого пользователя
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItemOfId(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) throws ValidationException {
+    public ResponseEntity<ItemDto> getItemOfId(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                               @PathVariable Long itemId) throws ValidationException {
         log.info("поступил запрос на просмотр вещи по идентификатору:" + itemId);
         return ResponseEntity.ok(itemService.getItemOfId(userId, itemId));
     }
@@ -59,7 +61,7 @@ public class ItemController {
     // только доступные для аренды вещи
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> getItemOfText(@RequestHeader("X-Sharer-User-Id") Optional<Long> userId,
-                                           @RequestParam("text") String text) throws ValidationException {
+                                                       @RequestParam("text") String text) throws ValidationException {
         log.info("поступил запрос на просмотр доступной для аренды вещи:" + text);
         return ResponseEntity.ok(itemService.getItemOfText(userId, text));
     }
@@ -67,7 +69,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> createComment(@Valid @RequestBody CommentDtoLittle commentDtoLittle,
                                                     @PathVariable Long itemId,
-                                                    @RequestHeader("X-Sharer-User-Id") long userId) {
+                                                    @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("пользователь с id {} оставил отзыв на вещь с id {}: {}", userId, itemId, commentDtoLittle);
 
         return ResponseEntity.ok(itemService.createComment(commentDtoLittle, itemId, userId));

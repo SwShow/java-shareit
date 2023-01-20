@@ -30,6 +30,7 @@ public class ItemRequestController {
 
     @GetMapping
     public ResponseEntity<Object> getItemRequestsByUser(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
+        log.info("поступил запрос пользователя {} на получение  списка своих запросов вместе с данными об ответах на них", userId);
         log.info("Get all user {} item requests", userId);
         return itemRequestClient.getItemRequestsByUser(userId);
     }
@@ -38,6 +39,7 @@ public class ItemRequestController {
     public ResponseEntity<Object> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
                                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                      @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("поступил запрос пользователя {} на получение  списка своих запросов вместе с данными об ответах на них", userId);
         log.info("Get all item requests without user {}", userId);
         return itemRequestClient.getAll(userId, from, size);
     }

@@ -59,16 +59,17 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchItem(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> searchItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @RequestParam(required = false) String text,
-                                             @RequestParam(required = false, defaultValue = "0") int from,
-                                             @RequestParam(required = false, defaultValue = "20") int size) {
+                                             @RequestParam(required = false, defaultValue = "0") Integer from,
+                                             @RequestParam(required = false, defaultValue = "20") Integer size) {
         log.info("Search items by text {}", text);
         return itemClient.searchItem(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> createComment(@PathVariable("itemId") @Min(1) Long itemId, @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+    public ResponseEntity<Object> createComment(@PathVariable("itemId") @Min(1) Long itemId,
+                                                @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
                                                 @Valid @RequestBody CommentDto commentDto) {
         log.info("Create comment to item {}", itemId);
         return itemClient.createComment(itemId, userId, commentDto);
